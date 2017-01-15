@@ -97,6 +97,12 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Pathoschild.Stardew.ModBuildConfig.1.4.0\build\Pathoschild.Stardew.ModBuildConfig.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Pathoschild.Stardew.ModBuildConfig.1.4.0\build\Pathoschild.Stardew.ModBuildConfig.targets'))" />
   </Target>
+  <Target Name="CreateManifest" BeforeTargets="AfterBuild">
+    <PropertyGroup>
+      <ToolPath>$(SolutionDir)BuildTools\bin\Debug\Igorious.BuildManifest.exe</ToolPath>
+    </PropertyGroup>
+    <Exec Command="$(ToolPath) $(TargetPath)" />
+  </Target>
   <Target Name="AfterBuild">
     <ItemGroup>
       <OutputFiles Include="$(TargetDir)**\*.*" />
