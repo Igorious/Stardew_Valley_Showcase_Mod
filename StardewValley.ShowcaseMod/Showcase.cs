@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Igorious.StardewValley.DynamicApi2.Data;
 using Igorious.StardewValley.ShowcaseMod.ModConfig;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,22 +14,13 @@ namespace Igorious.StardewValley.ShowcaseMod
 {
     public sealed class Showcase : Furniture
     {
-        private Chest GetChest()
-        {
-            if (heldObject == null)
-            {
-                var chest = new Chest(true);
-                heldObject = chest;
-                chest.items.AddRange(Enumerable.Repeat<Item>(null, Config.Rows * Config.Columns));
-            }
-            return (Chest)heldObject;
-        }
-
+        private ShowcaseConfig Config { get; }
         private List<Item> Items => GetChest().items;
 
-        private ShowcaseConfig Config => ShowcaseMod.Config.Showcase;
-
-        public Showcase(int id) : base(id, Vector2.Zero) { }
+        public Showcase(int id) : base(id, Vector2.Zero)
+        {
+            Config = ShowcaseMod.GetShowcaseConfig(ParentSheetIndex);
+        }
 
         public override bool clicked(Farmer who)
         {
@@ -43,60 +35,8 @@ namespace Igorious.StardewValley.ShowcaseMod
         {
             if (justCheckingForActivity) return true;
             RecalculateItems();
-            Game1.activeClickableMenu = new StorageContainer(Items, Math.Max(Items.Count(i => i != null), Config.Rows * Config.Columns), Config.Rows, OnContainterChanging, Utility.highlightShippableObjects);
-            return true;
-        }
-
-        private void RecalculateItems()
-        {
-            var prefferedCount = Config.Rows * Config.Columns;
-            while (Items.Count > prefferedCount && Items.Remove(null)) { }
-            while (Items.Count < prefferedCount)
-            {
-                Items.Add(null);
-            }
-        }
-
-        private bool OnContainterChanging(Item newItem, int position, Item oldItem, StorageContainer container, bool isRemoving)
-        {
-            if (isRemoving)
-            {
-                if (oldItem?.Stack > 1 && !oldItem.Equals(newItem))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (newItem.Stack > 1 || newItem.Stack == 1 && oldItem?.Stack == 1 && newItem.canStackWith(oldItem))
-                {
-                    if (oldItem != null)
-                    {
-                        if (oldItem.canStackWith(newItem))
-                        {
-                            container.ItemsToGrabMenu.actualInventory[position].Stack = 1;
-                        }
-                        else
-                        {
-                            Utility.addItemToInventory(oldItem, position, container.ItemsToGrabMenu.actualInventory);
-                        }
-                        container.heldItem = oldItem;
-                        return false;
-                    }
-
-                    var num = newItem.Stack - 1;
-                    var one = newItem.getOne();
-                    one.Stack = num;
-                    container.heldItem = one;
-                    newItem.Stack = 1;
-                }
-            }
-
-            if (position < Items.Count)
-            {
-                var newCellItem = !isRemoving || oldItem != null && !oldItem.Equals(newItem) ? newItem : null;
-                Items[position] = newCellItem;
-            }
+            var totalItemsCount = Math.Max(Items.Count(i => i != null), Config.Rows * Config.Columns);
+            Game1.activeClickableMenu = new StorageContainer(Items, totalItemsCount, Config.Rows, OnContainterChanging, Utility.highlightShippableObjects);
             return true;
         }
 
@@ -114,74 +54,211 @@ namespace Igorious.StardewValley.ShowcaseMod
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
-            var layerDepth = (boundingBox.Bottom - 8) / 10000f;
-            var viewPosition = x == -1
+            DrawFurniture(spriteBatch, x, y, alpha, out var viewPosition, out var layerDepth);
+            DrawItems(spriteBatch, alpha, viewPosition, layerDepth);
+        }
+
+        private void DrawFurniture(SpriteBatch spriteBatch, int x, int y, float alpha, out Vector2 viewPosition, out float layerDepth)
+        {
+            layerDepth = (boundingBox.Bottom - 8) / 10000f;
+            viewPosition = x == -1
                 ? Game1.GlobalToLocal(Game1.viewport, drawPosition)
                 : Game1.GlobalToLocal(Game1.viewport, new Vector2(x * Game1.tileSize, y * Game1.tileSize - (sourceRect.Height * Game1.pixelZoom - boundingBox.Height)));
 
             spriteBatch.Draw(
                 furnitureTexture,
-                viewPosition, 
-                sourceRect, 
-                Color.White * alpha, 
-                0, 
-                Vector2.Zero, 
-                Game1.pixelZoom, 
-                SpriteEffects.None, 
+                viewPosition,
+                sourceRect,
+                Color.White * alpha,
+                0,
+                Vector2.Zero,
+                Game1.pixelZoom,
+                SpriteEffects.None,
                 layerDepth);
+        }
 
-            var items = Items.Where(i => i != null).ToList();
-            if (items.Count == 0) return;
+        private void DrawItems(SpriteBatch spriteBatch, float alpha, Vector2 viewPosition, float layerDepth)
+        {
+            if (Items.All(i => i == null)) return;
 
-            var deadLeft = Config.Bounds.Left;
-            var deadRigth = Config.Bounds.Right;
-            var deadTop = Config.Bounds.Top;
-            var deadBottom = Config.Bounds.Bottom;
+            float workWidth = sourceRect.Width - Config.Bounds.Left - Config.Bounds.Right;
+            float workHeigth = sourceRect.Height - Config.Bounds.Top - Config.Bounds.Bottom;
 
-            float workWidth = sourceRect.Width - deadLeft - deadRigth;
-            float workHeigth = sourceRect.Height - deadTop - deadBottom;
+            var topRow = GetTopRow();
+            var bottomRow = GetBottomRow();
+            var leftColumn = GetLeftColumn();
+            var rightColumn = GetRightColumn();
 
-            (var n, var m) = CalculateRowsAndColumnsCount(items.Count);
+            var rowsCount = bottomRow - topRow + 1;
+            var columnsCount = rightColumn - leftColumn + 1;
 
-            var leftEmpty = Math.Max(0, workWidth - spriteSheetTileSize * m) / 2;
-            var topEmpty = Math.Max(0, workHeigth - spriteSheetTileSize * n) / 2;
-            var dx = m > 1? (workWidth - leftEmpty * 2 - spriteSheetTileSize) / (m - 1) : 0;
-            var dy = n > 1? (workHeigth - topEmpty * 2 - spriteSheetTileSize) / (n - 1) : 0;
+            var leftOffset = Math.Max(0, workWidth - spriteSheetTileSize * columnsCount) / 2;
+            var topOffset = Math.Max(0, workHeigth - spriteSheetTileSize * rowsCount) / 2;
+            var itemSpaceX = columnsCount > 1? (workWidth - leftOffset * 2 - spriteSheetTileSize) / (columnsCount - 1) : 0;
+            var itemSpaceY = rowsCount > 1? (workHeigth - topOffset * 2 - spriteSheetTileSize) / (rowsCount - 1) : 0;
 
-            for (var i = 0; i < n; ++i)
+            var viewScale = (float)Game1.tileSize / spriteSheetTileSize;
+            for (var i = topRow; i <= bottomRow; ++i)
             {
-                for (var j = 0; j < m; ++j)
+                for (var j = leftColumn; j <= rightColumn; ++j)
                 {
-                    var index = i * m + j;
-                    if (index == items.Count) break;
-                    var itemX = viewPosition.X + (deadLeft + leftEmpty + j * dx) * ((float)Game1.tileSize / spriteSheetTileSize);
-                    var itemY = viewPosition.Y + (deadTop + topEmpty + i * dy) * ((float)Game1.tileSize / spriteSheetTileSize);
-                    DrawItem((Object)items[index], spriteBatch, itemX, itemY, alpha, layerDepth + 0.00002f * (index + 1));
+                    var itemIndex = GetItemIndex(i, j);
+                    var item = Items[itemIndex] as Object;
+                    if (item == null) continue;
+                    var itemX = viewPosition.X + (Config.Bounds.Left + leftOffset + j * itemSpaceX) * viewScale;
+                    var itemY = viewPosition.Y + (Config.Bounds.Top + topOffset + i * itemSpaceY) * viewScale;
+                    DrawItem(item, spriteBatch, itemX, itemY, alpha, layerDepth + 0.00002f * (itemIndex + 1));
                 }
             }
         }
 
-        private static (int n, int m) CalculateRowsAndColumnsCount(int itemsCount)
+        private int GetTopRow()
         {
-            var k = (int)Math.Ceiling(Math.Sqrt(itemsCount));
-            return (k - 1) * k >= itemsCount? (k - 1, k) : (k, k);
+            for (var i = 0; i < Config.Rows; ++i)
+            {
+                for (var j = 0; j < Config.Columns; ++j)
+                {
+                    if (GetItem(i, j) != null) return i;
+                }
+            }
+            return 0;
         }
 
-        private static void DrawItem(Object item, SpriteBatch spriteBatch, float viewX, float viewY, float alpha, float layerDepth)
+        private int GetBottomRow()
         {
+            for (var i = Config.Rows - 1; i >= 0; --i)
+            {
+                for (var j = 0; j < Config.Columns; ++j)
+                {
+                    if (GetItem(i, j) != null) return i;
+                }
+            }
+            return 0;
+        }
+
+        private int GetLeftColumn()
+        {
+            for (var j = 0; j < Config.Columns; ++j)
+            {
+                for (var i = 0; i < Config.Rows; ++i)
+                {
+                    if (GetItem(i, j) != null) return j;
+                }
+            }
+            return 0;
+        }
+
+        private int GetRightColumn()
+        {
+            for (var j = Config.Columns - 1; j >= 0; --j)
+            {
+                for (var i = 0; i < Config.Rows; ++i)
+                {
+                    if (GetItem(i, j) != null) return j;
+                }
+            }
+            return 0;
+        }
+
+        private int GetItemIndex(int i, int j) => i * Config.Columns + j;
+
+        private Item GetItem(int i, int j) => Items[GetItemIndex(i, j)];
+
+        private void RecalculateItems()
+        {
+            var prefferedCount = Config.Rows * Config.Columns;
+            while (Items.Count > prefferedCount && Items.Remove(null)) { }
+            while (Items.Count < prefferedCount)
+            {
+                Items.Add(null);
+            }
+        }
+
+        private bool OnContainterChanging(Item newItem, int position, Item oldItem, StorageContainer container, bool isRemoving)
+        {
+            return isRemoving? OnItemRemoved(newItem, position, oldItem) : OnItemAdded(newItem, position, oldItem, container);
+        }
+
+        private bool OnItemRemoved(Item newItem, int position, Item oldItem)
+        {
+            if (oldItem?.Stack > 1 && !oldItem.Equals(newItem))
+            {
+                return false;
+            }
+
+            var newCellItem = oldItem != null && !oldItem.Equals(newItem) ? newItem : null;
+            Items[position] = newCellItem;
+            return true;
+        }
+
+        private bool OnItemAdded(Item newItem, int position, Item oldItem, StorageContainer container)
+        {
+            if (newItem.Stack > 1 || newItem.Stack == 1 && oldItem?.Stack == 1 && newItem.canStackWith(oldItem))
+            {
+                if (oldItem != null)
+                {
+                    if (oldItem.canStackWith(newItem))
+                    {
+                        container.ItemsToGrabMenu.actualInventory[position].Stack = 1;
+                    }
+                    else
+                    {
+                        Utility.addItemToInventory(oldItem, position, container.ItemsToGrabMenu.actualInventory);
+                    }
+                    container.heldItem = oldItem;
+                    return false;
+                }
+
+                var num = newItem.Stack - 1;
+                var one = newItem.getOne();
+                one.Stack = num;
+                container.heldItem = one;
+                newItem.Stack = 1;
+            }
+
+            if (position < Items.Count)
+            {
+                Items[position] = newItem;
+            }
+            return true;
+        }
+
+        private Chest GetChest()
+        {
+            if (heldObject == null)
+            {
+                var chest = new Chest(true);
+                heldObject = chest;
+                chest.items.AddRange(Enumerable.Repeat<Item>(null, Config.Rows * Config.Columns));
+            }
+            return (Chest)heldObject;
+        }
+
+        private void DrawItem(Object item, SpriteBatch spriteBatch, float viewX, float viewY, float alpha, float layerDepth)
+        {
+            var itemSize = Game1.tileSize * Config.Scale;
+            var delta = (Game1.tileSize - itemSize) / 2f;
+            var destRect = new Rectangle((int)(viewX + delta), (int)(viewY + delta), (int)itemSize, (int)itemSize);
             spriteBatch.Draw(
                 Game1.objectSpriteSheet,
-                new Rectangle(
-                    (int)viewX,
-                    (int)viewY,
-                    Game1.tileSize,
-                    Game1.tileSize),
-                Game1.currentLocation.getSourceRectForObject(item.ParentSheetIndex),
+                destRect,
+                TextureInfo.Objects.GetSourceRect(Game1.objectSpriteSheet, item.ParentSheetIndex),
                 Color.White * alpha,
                 0,
                 Vector2.Zero,
                 SpriteEffects.None,
                 layerDepth);
+
+            if (!(item is ColoredObject colored)) return;
+            spriteBatch.Draw(
+                Game1.objectSpriteSheet,
+                destRect,
+                TextureInfo.Objects.GetSourceRect(Game1.objectSpriteSheet, item.ParentSheetIndex + 1),
+                colored.color * alpha,
+                0,
+                Vector2.Zero,
+                SpriteEffects.None,
+                layerDepth + 0.0000001f);
         }
     }
 }

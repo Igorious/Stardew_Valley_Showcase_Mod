@@ -67,8 +67,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleCommand.cs" />
     <Compile Include="ModConfig\Bounds.cs" />
-    <Compile Include="FurnitureInfo.cs" />
     <Compile Include="Showcase.cs" />
     <Compile Include="ModConfig\ShowcaseConfig.cs" />
     <Compile Include="ShowcaseMod.cs" />

@@ -9,16 +9,16 @@ namespace Igorious.StardewValley.DynamicApi2.Services
 {
     public sealed class Traverser
     {
-        public static Traverser Instance { get; } = new Traverser();
+        private static readonly Lazy<Traverser> Lazy = new Lazy<Traverser>(() => new Traverser());
+        public static Traverser Instance => Lazy.Value;
+        private Traverser() { }
 
         public void TraverseLocations(Action<GameLocation> processLocation)
         {
             foreach (var location in Game1.locations)
             {
                 processLocation(location);
-
-                var buildableLocation = location as BuildableGameLocation;
-                if (buildableLocation == null) continue;
+                if (!(location is BuildableGameLocation buildableLocation)) continue;
 
                 foreach (var building in buildableLocation.buildings)
                 {
@@ -49,15 +49,13 @@ namespace Igorious.StardewValley.DynamicApi2.Services
                 }
             }
 
-            var decoratableLocation = location as DecoratableLocation;
-            if (decoratableLocation == null) return;
+            if (!(location is DecoratableLocation decoratableLocation)) return;
             for (var i = 0; i < decoratableLocation.furniture.Count; ++i)
             {
                 decoratableLocation.furniture[i] = (Furniture)processObject(decoratableLocation.furniture[i]);
             }
 
-            var farmHouse = decoratableLocation as FarmHouse;
-            if (farmHouse == null) return;
+            if (!(decoratableLocation is FarmHouse farmHouse)) return;
             TraverseChest(farmHouse.fridge, processObject);           
         }
 
@@ -66,8 +64,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             if (farmer == null) return;
             for (var i = 0; i < farmer.Items.Count; ++i)
             {
-                var inventoryObject = farmer.Items[i] as Object;
-                if (inventoryObject == null) continue;
+                if (!(farmer.Items[i] is Object inventoryObject)) continue;
                 farmer.Items[i] = processObject(inventoryObject);
             }
             if (farmer.ActiveObject != null)
@@ -81,8 +78,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             if (chest == null) return;
             for (var i = 0; i < chest.items.Count; ++i)
             {
-                var chestObject = chest.items[i] as Object;
-                if (chestObject == null) continue;
+                if (!(chest.items[i] is Object chestObject)) continue;
                 chest.items[i] = processObject(chestObject);
             }
         }

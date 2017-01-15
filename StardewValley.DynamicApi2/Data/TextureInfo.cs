@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Igorious.StardewValley.DynamicApi2.Services
+namespace Igorious.StardewValley.DynamicApi2.Data
 {
     public sealed class TextureInfo
     {
         public static TextureInfo Furniture { get; } = new TextureInfo(nameof(Furniture), 16, 16);
+        public static TextureInfo Objects { get; } = new TextureInfo(nameof(Objects), 16, 16);
 
         public TextureInfo(string name, int spriteWidth, int spriteHeigth)
         {

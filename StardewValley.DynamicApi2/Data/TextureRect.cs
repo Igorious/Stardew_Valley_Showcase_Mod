@@ -1,5 +1,8 @@
-namespace Igorious.StardewValley.DynamicApi2.Services
+using System.Diagnostics;
+
+namespace Igorious.StardewValley.DynamicApi2.Data
 {
+    [DebuggerDisplay("{Index} [{Length}x{Height}]")]
     public sealed class TextureRect
     {
         public int Index { get; }
@@ -39,19 +42,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             }
         }
 
-        public static bool operator ==(TextureRect left, TextureRect right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(TextureRect left, TextureRect right)
-        {
-            return !Equals(left, right);
-        }
-
-        public override string ToString()
-        {
-            return $"{Index} [{Length}x{Height}]";
-        }
+        public static bool operator ==(TextureRect left, TextureRect right) => Equals(left, right);
+        public static bool operator !=(TextureRect left, TextureRect right) => !Equals(left, right);
     }
 }

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Igorious.StardewValley.DynamicApi2.Constants;
+using Igorious.StardewValley.DynamicApi2.Data;
 using Igorious.StardewValley.DynamicApi2.Services;
 using Igorious.StardewValley.ShowcaseMod.ModConfig;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Objects;
 
@@ -14,27 +14,43 @@ namespace Igorious.StardewValley.ShowcaseMod
 {
     public class ShowcaseMod : Mod
     {
+        private static ShowcaseModConfig Config { get; } = new ShowcaseModConfig();
+
         public override void Entry(IModHelper helper)
         {
-            Config = helper.ReadConfig<ShowcaseModConfig>();
-            TextureOverrideService.Instance.Run<ShowcaseMod>(Path.Combine(Helper.DirectoryPath, "Resources"));
-            TextureOverrideService.Instance.Furniture<ShowcaseMod>(new TextureRect(0, Config.Showcase.Size.Width, Config.Showcase.Size.Height), Config.Showcase.ID);
-            RegisterClassService.Instance.Furniture<Showcase>(Config.Showcase.ID);
-            CarpenterShopInterceptor.Instance.Run();
-            CarpenterShopInterceptor.Instance.AddFurniture(Config.Showcase.ID);
-            MapperService.Instance.Run();
-            GameEvents.LoadContent += OnLoadContent;
+            Config.Load(Helper.DirectoryPath);
 
-            Command.RegisterCommand("list_furniture", "List furniture").CommandFired += OnListFurnitureCommand;
-            Command.RegisterCommand("player_addfurniture", "Add furniture", new []{ "ID" }).CommandFired += OnPlayerAddFurnitureCommand;
+            Config.Showcases.ForEach(s => ClassMapper.Instance.MapFurniture<Showcase>(s.ID));
+            
+            var textureModule = TextureService.Instance.RegisterModule<ShowcaseMod>(Path.Combine(Helper.DirectoryPath, "Resources"));
+            Config.Showcases.ForEach(s => textureModule.OverrideFurniture(new TextureRect(s.SpriteIndex, s.Size.Width, s.Size.Height), s.ID));
+
+            Config.Showcases.ForEach(s =>
+                DataService.Instance.RegisterFurniture(new FurnitureInfo
+                {
+                    ID = s.ID,
+                    Name = s.Name,
+                    Kind = s.Kind,
+                    Size = s.Size,
+                    BoundingBox = s.Size,
+                    Price = s.Price,
+                    Rotations = 1,
+                }));
+
+            Config.Showcases.ForEach(s => ShopService.Instance.AddFurniture(Locations.CarpentersShop, new ShopItemInfo(s.ID)));
+
+            ConsoleCommand.Register("list_furniture", "List furniture", OnListFurnitureCommand);
+            ConsoleCommand.Register("player_addfurniture", "Add furniture", new[] { "ID" }, OnPlayerAddFurnitureCommand);
         }
 
-        private void OnListFurnitureCommand(object sender, EventArgsCommand e)
+        public static ShowcaseConfig GetShowcaseConfig(int id)
         {
-            var furnitureData = Game1.content.Load<Dictionary<int, string>>(@"Data\Furniture")
-                .Select(kv => (ID: kv.Key, Name: kv.Value.Split('/').First()));
+            return Config.Showcases.First(c => c.ID == id);
+        }
 
-            var args = e.Command.CalledArgs;
+        private void OnListFurnitureCommand(IReadOnlyList<string> args)
+        {
+            var furnitureData = DataService.Instance.GetFurniture().Select(kv => (ID: kv.Key, Name: kv.Value.Split('/').First()));
             var orderedFurniture = args.Any()? furnitureData.OrderBy(f => f.Name) : furnitureData.OrderBy(f => f.ID);
             foreach (var furnitureInfo in orderedFurniture)
             {
@@ -42,27 +58,10 @@ namespace Igorious.StardewValley.ShowcaseMod
             }
         }
 
-        private void OnPlayerAddFurnitureCommand(object sender, EventArgsCommand e)
+        private void OnPlayerAddFurnitureCommand(IReadOnlyList<string> args)
         {
-            var args = e.Command.CalledArgs;
             if (!args.Any() || !int.TryParse(args.First(), out var id)) return;
             Game1.player.addItemByMenuIfNecessary(new Furniture(id, Vector2.Zero));
-        }
-
-        public static ShowcaseModConfig Config { get; private set; }
-
-        private void OnLoadContent(object sender, EventArgs eventArgs)
-        {
-            var furnitureData = Game1.content.Load<Dictionary<int, string>>(@"Data\Furniture");
-            furnitureData.Add(Config.Showcase.ID, new FurnitureInfo
-            {
-                Name = Config.Showcase.Name,
-                Type = "table",
-                Size = Config.Showcase.Size,
-                BoundingBox = Config.Showcase.Size,
-                Price = Config.Showcase.Price,
-                Rotations = 1,
-            }.ToString());
         }
     }
 }

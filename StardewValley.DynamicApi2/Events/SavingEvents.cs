@@ -2,7 +2,7 @@
 using StardewModdingAPI.Events;
 using StardewValley.Menus;
 
-namespace Igorious.StardewValley.DynamicApi2
+namespace Igorious.StardewValley.DynamicApi2.Events
 {
     public static class SavingEvents
     {
