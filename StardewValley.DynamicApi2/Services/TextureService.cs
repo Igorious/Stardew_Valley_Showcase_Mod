@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Igorious.StardewValley.DynamicApi2.Data;
@@ -100,6 +101,17 @@ namespace Igorious.StardewValley.DynamicApi2.Services
                         }
                     }
                 }
+            }
+
+            SaveTexture(originalTexture, _modulePaths[spriteOverrides.First().Value.Module], info);
+        }
+
+        [Conditional("DEBUG")]
+        private void SaveTexture(Texture2D texture, string path, TextureInfo info)
+        {
+            using (var imageStream = new FileStream(Path.Combine(path, $"{info.Name}.temp.png"), FileMode.OpenOrCreate))
+            {
+                texture.SaveAsPng(imageStream, texture.Width, texture.Height);
             }
         }
 

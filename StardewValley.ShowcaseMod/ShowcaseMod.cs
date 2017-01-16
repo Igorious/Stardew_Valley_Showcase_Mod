@@ -23,7 +23,7 @@ namespace Igorious.StardewValley.ShowcaseMod
             Config.Showcases.ForEach(s => ClassMapper.Instance.MapFurniture<Showcase>(s.ID));
             
             var textureModule = TextureService.Instance.RegisterModule<ShowcaseMod>(Path.Combine(Helper.DirectoryPath, "Resources"));
-            Config.Showcases.ForEach(s => textureModule.OverrideFurniture(new TextureRect(s.SpriteIndex, s.Size.Width, s.Size.Height), s.ID));
+            Config.Showcases.ForEach(s => textureModule.OverrideFurniture(new TextureRect(s.SpriteIndex, s.Size.Width * s.SpritesCount, s.Size.Height), s.ID));
 
             Config.Showcases.ForEach(s =>
                 DataService.Instance.RegisterFurniture(new FurnitureInfo
@@ -32,7 +32,7 @@ namespace Igorious.StardewValley.ShowcaseMod
                     Name = s.Name,
                     Kind = s.Kind,
                     Size = s.Size,
-                    BoundingBox = s.Size,
+                    BoundingBox = (s.BoundingBox == Size.Default) ? s.Size : s.BoundingBox,
                     Price = s.Price,
                     Rotations = 1,
                 }));

@@ -56,6 +56,7 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>D:\Games\Steam\steamapps\common\Stardew Valley\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="StardewModdingAPI">
       <HintPath>D:\Games\Steam\steamapps\common\Stardew Valley\StardewModdingAPI.exe</HintPath>

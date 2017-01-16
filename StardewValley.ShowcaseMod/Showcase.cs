@@ -35,14 +35,17 @@ namespace Igorious.StardewValley.ShowcaseMod
         {
             if (justCheckingForActivity) return true;
             RecalculateItems();
-            var totalItemsCount = Math.Max(Items.Count(i => i != null), Config.Rows * Config.Columns);
-            Game1.activeClickableMenu = new StorageContainer(Items, totalItemsCount, Config.Rows, OnContainterChanging, Utility.highlightShippableObjects);
+            var cellsCount = (Items.Count + Config.Rows - 1) / Config.Rows * Config.Rows;
+            var storageContainer = new StorageContainer(Items, cellsCount, Config.Rows, OnContainterChanging, Utility.highlightShippableObjects);
+            storageContainer.ItemsToGrabMenu.movePosition(0, (3 - Config.Rows) * Game1.tileSize);
+            Game1.activeClickableMenu = storageContainer;
             return true;
         }
 
         public override bool performObjectDropInAction(Object dropIn, bool probe, Farmer who)
         {
             if (!Utility.highlightShippableObjects(dropIn)) return false;
+            RecalculateItems();
             var emptyCellIndex = Items.IndexOf(null);
             if (emptyCellIndex == -1) return false;
             if (probe) return true;
@@ -54,30 +57,38 @@ namespace Igorious.StardewValley.ShowcaseMod
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
-            DrawFurniture(spriteBatch, x, y, alpha, out var viewPosition, out var layerDepth);
-            DrawItems(spriteBatch, alpha, viewPosition, layerDepth);
+            var layerDepth = (boundingBox.Bottom - 8) / 10000f;
+            DrawFurniture(spriteBatch, x, y, alpha, HasOverlay(), out var viewPosition, ref layerDepth);
+            DrawItems(spriteBatch, alpha * Config.Alpha, viewPosition, ref layerDepth);
+            if (HasOverlay()) DrawFurniture(spriteBatch, x, y, alpha, false, out viewPosition, ref layerDepth);
         }
 
-        private void DrawFurniture(SpriteBatch spriteBatch, int x, int y, float alpha, out Vector2 viewPosition, out float layerDepth)
+        private void DrawFurniture(SpriteBatch spriteBatch, int x, int y, float alpha, bool useOverlay, out Vector2 viewPosition, ref float layerDepth)
         {
-            layerDepth = (boundingBox.Bottom - 8) / 10000f;
             viewPosition = x == -1
                 ? Game1.GlobalToLocal(Game1.viewport, drawPosition)
                 : Game1.GlobalToLocal(Game1.viewport, new Vector2(x * Game1.tileSize, y * Game1.tileSize - (sourceRect.Height * Game1.pixelZoom - boundingBox.Height)));
 
+            var baseSourceRect = useOverlay
+                ? new Rectangle(sourceRect.X + sourceRect.Width, sourceRect.Y, sourceRect.Width, sourceRect.Height)
+                : sourceRect;
+
             spriteBatch.Draw(
                 furnitureTexture,
                 viewPosition,
-                sourceRect,
+                baseSourceRect,
                 Color.White * alpha,
                 0,
                 Vector2.Zero,
                 Game1.pixelZoom,
                 SpriteEffects.None,
                 layerDepth);
+            layerDepth += 0.0000001f;
         }
 
-        private void DrawItems(SpriteBatch spriteBatch, float alpha, Vector2 viewPosition, float layerDepth)
+        private bool HasOverlay() => (Config.SpritesCount > 1);
+
+        private void DrawItems(SpriteBatch spriteBatch, float alpha, Vector2 viewPosition, ref float layerDepth)
         {
             if (Items.All(i => i == null)) return;
 
@@ -102,12 +113,12 @@ namespace Igorious.StardewValley.ShowcaseMod
             {
                 for (var j = leftColumn; j <= rightColumn; ++j)
                 {
-                    var itemIndex = GetItemIndex(i, j);
-                    var item = Items[itemIndex] as Object;
+                    var item = TryGetItem(i, j) as Object;
                     if (item == null) continue;
-                    var itemX = viewPosition.X + (Config.Bounds.Left + leftOffset + j * itemSpaceX) * viewScale;
-                    var itemY = viewPosition.Y + (Config.Bounds.Top + topOffset + i * itemSpaceY) * viewScale;
-                    DrawItem(item, spriteBatch, itemX, itemY, alpha, layerDepth + 0.00002f * (itemIndex + 1));
+                    var itemX = viewPosition.X + (Config.Bounds.Left + leftOffset + (j - leftColumn) * itemSpaceX) * viewScale;
+                    var itemY = viewPosition.Y + (Config.Bounds.Top + topOffset + (i - topRow) * itemSpaceY) * viewScale;
+                    DrawItem(item, spriteBatch, itemX, itemY, alpha, layerDepth);
+                    layerDepth += 0.0000001f;
                 }
             }
         }
@@ -118,7 +129,7 @@ namespace Igorious.StardewValley.ShowcaseMod
             {
                 for (var j = 0; j < Config.Columns; ++j)
                 {
-                    if (GetItem(i, j) != null) return i;
+                    if (TryGetItem(i, j) != null) return i;
                 }
             }
             return 0;
@@ -130,7 +141,7 @@ namespace Igorious.StardewValley.ShowcaseMod
             {
                 for (var j = 0; j < Config.Columns; ++j)
                 {
-                    if (GetItem(i, j) != null) return i;
+                    if (TryGetItem(i, j) != null) return i;
                 }
             }
             return 0;
@@ -142,7 +153,7 @@ namespace Igorious.StardewValley.ShowcaseMod
             {
                 for (var i = 0; i < Config.Rows; ++i)
                 {
-                    if (GetItem(i, j) != null) return j;
+                    if (TryGetItem(i, j) != null) return j;
                 }
             }
             return 0;
@@ -154,7 +165,7 @@ namespace Igorious.StardewValley.ShowcaseMod
             {
                 for (var i = 0; i < Config.Rows; ++i)
                 {
-                    if (GetItem(i, j) != null) return j;
+                    if (TryGetItem(i, j) != null) return j;
                 }
             }
             return 0;
@@ -162,7 +173,11 @@ namespace Igorious.StardewValley.ShowcaseMod
 
         private int GetItemIndex(int i, int j) => i * Config.Columns + j;
 
-        private Item GetItem(int i, int j) => Items[GetItemIndex(i, j)];
+        private Item TryGetItem(int i, int j)
+        {
+            var itemIndex = GetItemIndex(i, j);
+            return (itemIndex < Items.Count)? Items[GetItemIndex(i, j)] : null;
+        }
 
         private void RecalculateItems()
         {
