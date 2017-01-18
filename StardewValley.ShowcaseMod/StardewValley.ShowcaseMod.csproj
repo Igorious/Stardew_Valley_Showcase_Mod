@@ -72,9 +72,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleCommand.cs" />
+    <Compile Include="Core\ItemFilter.cs" />
+    <Compile Include="Core\Showcase.Draw.cs" />
+    <Compile Include="Core\ItemContainerProvider.cs" />
     <Compile Include="ModConfig\Bounds.cs" />
-    <Compile Include="Showcase.cs" />
+    <Compile Include="Core\Showcase.cs" />
     <Compile Include="ModConfig\ShowcaseConfig.cs" />
+    <Compile Include="Core\ShowcaseContainer.cs" />
     <Compile Include="ShowcaseMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModConfig\ShowcaseModConfig.cs" />

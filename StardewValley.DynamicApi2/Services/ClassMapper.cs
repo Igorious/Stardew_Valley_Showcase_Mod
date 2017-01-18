@@ -19,7 +19,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
 
         private ClassMapper()
         {
-            PlayerEvents.LoadedGame += (s, e) => ActivateMapping();
+            SaveEvents.AfterLoad += (s, e) => ActivateMapping();
             SavingEvents.BeforeSaving += DeactivateMapping;
             SavingEvents.AfterSaving += ActivateMapping;
             LocationEvents.CurrentLocationChanged += OnCurrentLocationChanged;
@@ -38,19 +38,19 @@ namespace Igorious.StardewValley.DynamicApi2.Services
         private void ActivateMapping()
         {
             IsMappingActivated = true;
-            Console.WriteLine("Activating mapping...");
+            Log.Trace("Activating mapping...");
             Traverser.Instance.TraverseLocations(l => Traverser.Instance.TraverseLocation(l, Wrap));
             Traverser.Instance.TraverseInventory(Game1.player, Wrap);
-            Console.WriteLine("Mapping is activated.");
+            Log.Trace("Mapping is activated.");
         }
 
         private void DeactivateMapping()
         {
             IsMappingActivated = false;
-            Console.WriteLine("Deactivating mapping...");
+            Log.Trace("Deactivating mapping...");
             Traverser.Instance.TraverseLocations(l => Traverser.Instance.TraverseLocation(l, Unwrap));
             Traverser.Instance.TraverseInventory(Game1.player, Unwrap);
-            Console.WriteLine("Mapping is deactivated.");
+            Log.Trace("Mapping is deactivated.");
         }
 
         private void OnInventoryChanged(object s, EventArgsInventoryChanged e)
@@ -60,26 +60,35 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             foreach (var addedItemInfo in e.Added)
             {
                 var addedItem = addedItemInfo.Item as Object;
+                if (addedItem == null) return;
                 var index = inventory.FindIndex(i => i == addedItem);
-                inventory[index] = Wrap(addedItem);
+                var wrappedItem = Wrap(addedItem);
+                if (addedItem == wrappedItem) continue;
+                Log.Trace("Inventory object mapped.");
+                inventory[index] = wrappedItem;
             }
         }
 
         private void OnObjectChanged(ObjectEventArgs args)
         {
             if (!IsMappingActivated) return;
-            args.Object = Wrap(args.Object);
+            var wrappedItem = Wrap(args.Object);
+            if (args.Object == wrappedItem) return;
+            Log.Trace("Active object mapped.");
+            args.Object = wrappedItem;
         }
 
         private void OnLocationObjectsChanged(object sender, EventArgsLocationObjectsChanged e)
         {
             if (!IsMappingActivated) return;
+            Log.Trace("Location objects changed...");
             Traverser.Instance.TraverseLocation(Game1.currentLocation, Wrap);
         }
 
         private void OnCurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
         {
             if (!IsMappingActivated) return;
+            Log.Trace("Location changed...");
             Traverser.Instance.TraverseLocation(Game1.currentLocation, Wrap);
         }
 

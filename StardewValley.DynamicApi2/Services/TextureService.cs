@@ -60,7 +60,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
         private void OverrideSprites()
         {
             LoadFurnitureTexture();
-            OverrideTexture(ref Furniture.furnitureTexture, _furnitureOverrides, TextureInfo.Furniture);
+            OverrideTexture(ref Furniture.furnitureTexture, _furnitureOverrides, TextureInfo.Furnitures);
 
             // TODO: Other textures.
         }

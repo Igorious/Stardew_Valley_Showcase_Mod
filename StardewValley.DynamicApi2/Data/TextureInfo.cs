@@ -1,15 +1,22 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using StardewValley;
+using StardewValley.Objects;
 
 namespace Igorious.StardewValley.DynamicApi2.Data
 {
     public sealed class TextureInfo
     {
-        public static TextureInfo Furniture { get; } = new TextureInfo(nameof(Furniture), 16, 16);
-        public static TextureInfo Objects { get; } = new TextureInfo(nameof(Objects), 16, 16);
+        public static TextureInfo Furnitures { get; } = new TextureInfo("Furniture", () => Furniture.furnitureTexture);
+        public static TextureInfo Objects { get; } = new TextureInfo("Objects", () => Game1.objectSpriteSheet);
+        public static TextureInfo Weapons { get; } = new TextureInfo("Weapons", () => Tool.weaponsTexture);
 
-        public TextureInfo(string name, int spriteWidth, int spriteHeigth)
+        private readonly Func<Texture2D> _getTexture;
+
+        public TextureInfo(string name, Func<Texture2D> getTexture, int spriteWidth = 16, int spriteHeigth = 16)
         {
+            _getTexture = getTexture;
             Name = name;
             SpriteWidth = spriteWidth;
             SpriteHeigth = spriteHeigth;
@@ -18,6 +25,9 @@ namespace Igorious.StardewValley.DynamicApi2.Data
         public string Name { get; }
         public int SpriteWidth { get; }
         public int SpriteHeigth { get; }
+        public Texture2D Texture => _getTexture();
+
+        public Rectangle GetSourceRect(int index, int spriteTileWidth = 1, int spriteTileHeight = 1) => GetSourceRect(Texture, index, spriteTileWidth, spriteTileHeight);
 
         public Rectangle GetSourceRect(Texture2D texture, int index, int spriteTileWidth = 1, int spriteTileHeight = 1)
         {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using Igorious.StardewValley.DynamicApi2.Extensions;
 using Newtonsoft.Json;
-using StardewModdingAPI;
+using Log = Igorious.StardewValley.DynamicApi2.Utils.Log;
 
 namespace Igorious.StardewValley.DynamicApi2
 {
@@ -44,7 +44,7 @@ namespace Igorious.StardewValley.DynamicApi2
                 {
                     var value = property.GetValue(this);
                     File.WriteAllText(filePath, value.ToJson());
-                    Log.Info($"Created default configuration for {property.Name}");
+                    Log.Debug($"Created default configuration for {property.Name}");
                 }
             }
         }

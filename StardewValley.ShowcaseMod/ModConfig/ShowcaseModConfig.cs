@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Igorious.StardewValley.DynamicApi2;
+using Igorious.StardewValley.DynamicApi2.Constants;
 using Igorious.StardewValley.DynamicApi2.Data;
+using Igorious.StardewValley.ShowcaseMod.Core;
 
 namespace Igorious.StardewValley.ShowcaseMod.ModConfig
 {
@@ -27,6 +29,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Columns = 3,
                     Rows = 3,
                     Kind = "table",
+                    Filter = $"{ItemFilter.ShippableCategory}",
                 },
                 new ShowcaseConfig
                 {
@@ -44,6 +47,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Rows = 1,
                     Kind = "painting",
                     Scale = 0.85f,
+                    Filter = $"{nameof(CategoryID.Fish)}",
                 },
                 new ShowcaseConfig
                 {
@@ -66,6 +70,22 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Kind = "other",
                     Scale = 0.80f,
                     Alpha = 0.60f,
+                    Filter = $"{ItemFilter.ShippableCategory} !{nameof(CategoryID.Cooking)}",
+                },
+                new ShowcaseConfig
+                {
+                    SpriteIndex = 9,
+                    ID = 1231,
+                    Name = "Old Shield",
+                    Size = new Size(1, 2),
+                    Bounds = new Bounds { Top = 2 },
+                    Price = 1000,
+                    Columns = 1,
+                    Rows = 1,
+                    Kind = "painting",
+                    Scale = 1,
+                    InverseLayouts = true,
+                    Filter = $"{nameof(CategoryID.Weapon)}",
                 },
             };
         }

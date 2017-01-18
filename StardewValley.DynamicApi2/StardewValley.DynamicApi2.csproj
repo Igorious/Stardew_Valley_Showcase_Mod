@@ -74,6 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\CategoryID.cs" />
     <Compile Include="DynamicConfiguration.cs" />
     <Compile Include="Data\FurnitureInfo.cs" />
     <Compile Include="Data\Size.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="Services\Traverser.cs" />
     <Compile Include="Services\ClassMapper.cs" />
     <Compile Include="Utils\Constructor.cs" />
+    <Compile Include="Utils\Log.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

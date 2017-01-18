@@ -6,13 +6,13 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
 {
     public class ShowcaseConfig
     {
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(Required = Required.Always), DefaultValue(-1)]
         public int ID { get; set; }
 
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(Required = Required.Always), DefaultValue("{Incognita}")]
         public string Name { get; set; }
 
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(Required = Required.Always), DefaultValue(-1)]
         public int SpriteIndex { get; set; }
 
         [DefaultValue(1)]
@@ -40,5 +40,10 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
 
         [DefaultValue(1)]
         public float Alpha { get; set; } = 1;
+
+        [DefaultValue(false)]
+        public bool InverseLayouts { get; set; }
+
+        public string Filter { get; set; }
     }
 }

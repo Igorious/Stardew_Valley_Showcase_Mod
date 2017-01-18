@@ -4,6 +4,7 @@ using System.Linq;
 using Igorious.StardewValley.DynamicApi2.Constants;
 using Igorious.StardewValley.DynamicApi2.Data;
 using Igorious.StardewValley.DynamicApi2.Services;
+using Igorious.StardewValley.ShowcaseMod.Core;
 using Igorious.StardewValley.ShowcaseMod.ModConfig;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
