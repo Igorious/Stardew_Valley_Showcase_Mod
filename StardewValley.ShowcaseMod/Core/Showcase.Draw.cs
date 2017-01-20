@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using Igorious.StardewValley.DynamicApi2.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,25 +12,54 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 {
     public partial class Showcase
     {
-        private static float TileScale => (float)Game1.tileSize / spriteSheetTileSize;
         private static Vector2 TileSize => new Vector2(Game1.tileSize, Game1.tileSize);
+
+        public override void drawInMenu(SpriteBatch spriteBatch, Vector2 location, float scaleSize, float alpha, float layerDepth, bool drawStackNumber)
+        {
+            var iconScale = GetMenuIconScaleSize();
+            var iconOffsetW = sourceRect.Width * scaleSize * iconScale;
+            var iconOffsetH = sourceRect.Height * scaleSize * iconScale;
+            var offset = (TileSize - new Vector2(iconOffsetW, iconOffsetH)) / 2;
+            Draw(spriteBatch, alpha, location + offset, scaleSize * iconScale, layerDepth);
+        }
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
         {
+            var viewPosition = GetViewPosition(x, y);
             var layerDepth = (boundingBox.Bottom - 8) / 10000f;
-            DrawFurniture(spriteBatch, x, y, alpha, Config.IsTwoLayer, out var viewPosition, ref layerDepth);
-            DrawItems(spriteBatch, alpha * Config.Alpha, viewPosition, ref layerDepth);
-            if (Config.IsTwoLayer) DrawFurniture(spriteBatch, x, y, alpha, false, out viewPosition, ref layerDepth);
+            Draw(spriteBatch, alpha, viewPosition, Game1.pixelZoom, layerDepth);
         }
 
-        private void DrawFurniture(SpriteBatch spriteBatch, int x, int y, float alpha, bool useOverlay, out Vector2 viewPosition, ref float layerDepth)
+        private void Draw(SpriteBatch spriteBatch, float alpha, Vector2 viewPosition, float scaleSize, float layerDepth)
+        {
+            if (Config.InverseLayouts)
+            {
+                if (Config.IsTwoLayer) DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, false, ref layerDepth);
+                DrawItems(spriteBatch, alpha * Config.Alpha, viewPosition, scaleSize, ref layerDepth);
+                DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, Config.IsTwoLayer, ref layerDepth);
+            }
+            else
+            {
+                DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, Config.IsTwoLayer, ref layerDepth);
+                DrawItems(spriteBatch, alpha * Config.Alpha, viewPosition, scaleSize, ref layerDepth);
+                if (Config.IsTwoLayer) DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, false, ref layerDepth);
+            }
+        }
+
+        private float GetMenuIconScaleSize() => (float) GetType().BaseType
+            .GetMethod("getScaleSize", BindingFlags.Instance | BindingFlags.NonPublic)
+            .Invoke(this, new object[0]);
+
+        private Vector2 GetViewPosition(int x, int y)
         {
             var globalPosition = x == -1
                 ? drawPosition
                 : new Vector2(x * Game1.tileSize, y * Game1.tileSize - (sourceRect.Height * Game1.pixelZoom - boundingBox.Height));
+            return Game1.GlobalToLocal(Game1.viewport, globalPosition);
+        }
 
-            viewPosition = Game1.GlobalToLocal(Game1.viewport, globalPosition);
-
+        private void DrawFurniture(SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, bool useOverlay, ref float layerDepth)
+        {
             var baseSourceRect = useOverlay
                 ? new Rectangle(sourceRect.X + sourceRect.Width, sourceRect.Y, sourceRect.Width, sourceRect.Height)
                 : sourceRect;
@@ -41,7 +71,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                 Color.White * alpha,
                 0,
                 Vector2.Zero,
-                Game1.pixelZoom,
+                scaleSize,
                 flipped? SpriteEffects.FlipHorizontally : SpriteEffects.None,
                 layerDepth);
 
@@ -50,10 +80,10 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         private void ChangeDepth(ref float layerDepth)
         {
-            layerDepth += (Config.InverseLayouts ? -1 : +1) * 0.0000001f;
+            layerDepth += 0.0000001f;
         }
 
-        private void DrawItems(SpriteBatch spriteBatch, float alpha, Vector2 viewPosition, ref float layerDepth)
+        private void DrawItems(SpriteBatch spriteBatch, float alpha, Vector2 viewPosition, float scaleSize, ref float layerDepth)
         {
             if (Items.All(i => i == null)) return;
 
@@ -82,7 +112,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             var horizontalItemOffset = columnsCount > 1 ? (workWidth - leftEmptyOffset * 2 - spriteSheetTileSize) / (columnsCount - 1) : 0;
             var verticalItemOffset = rowsCount > 1 ? (workHeigth - topEmptyOffset * 2 - spriteSheetTileSize) / (rowsCount - 1) : 0;
 
-            var offset = new Vector2((flipped? bounds.Right : bounds.Left) + leftEmptyOffset, bounds.Top + topEmptyOffset) * TileScale;
+            var offset = new Vector2((flipped? bounds.Right : bounds.Left) + leftEmptyOffset, bounds.Top + topEmptyOffset) * scaleSize;
 
             for (var i = itemProvider.TopRow; i <= itemProvider.BottomRow; ++i)
             {
@@ -91,22 +121,22 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                     var item = itemProvider[i, j];
                     if (item == null) continue;
                     var tileDelta = new Vector2((j - itemProvider.LeftColumn) * horizontalItemOffset, (i - itemProvider.TopRow) * verticalItemOffset);
-                    DrawItem((dynamic)item, spriteBatch, viewPosition + offset + tileDelta * TileScale, alpha, layerDepth);
+                    DrawItem((dynamic)item, spriteBatch, viewPosition + offset + tileDelta * scaleSize, alpha, scaleSize, layerDepth);
                     ChangeDepth(ref layerDepth);
                 }
             }
         }
 
-        private void DrawItem(Object item, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float layerDepth)
+        private void DrawItem(Object item, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, float layerDepth)
         {
             void DrawObjectSprite(int spriteIndex, Color color, float depth) => spriteBatch.Draw(
                 Game1.objectSpriteSheet,
-                viewPosition + TileSize / 2,
+                viewPosition + TileSize / 2 * (scaleSize / Game1.pixelZoom),
                 TextureInfo.Objects.GetSourceRect(spriteIndex),
                 color * alpha,
                 0,
                 new Vector2(spriteSheetTileSize, spriteSheetTileSize) / 2f,
-                TileScale * Config.Scale,
+                scaleSize * Config.Scale,
                 SpriteEffects.None,
                 depth);
 
@@ -117,7 +147,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         private static int ScytheID = 47;
 
-        private void DrawItem(Tool tool, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float layerDepth)
+        private void DrawItem(Tool tool, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, float layerDepth)
         {
             float GetSpriteRotation()
             {
@@ -138,15 +168,16 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
             var textureInfo = IsWeapon()? TextureInfo.Weapons : TextureInfo.Tools;
             var rotation = GetSpriteRotation();
+            var tileScaledSize = Game1.tileSize / 2f * (scaleSize / Game1.pixelZoom);
 
             spriteBatch.Draw(
                 textureInfo.Texture,
-                viewPosition + new Vector2(Game1.tileSize / 2f, Game1.tileSize / 2f / ((rotation != 0)? 1.414f : 1)),
+                viewPosition + new Vector2(tileScaledSize, tileScaledSize / ((rotation != 0)? 1.414f : 1)),
                 textureInfo.GetSourceRect(tool.indexOfMenuItemView),
                 Color.White * alpha,
                 rotation,
                 new Vector2(spriteSheetTileSize, spriteSheetTileSize) / 2f,
-                Game1.pixelZoom * Config.Scale,
+                scaleSize * Config.Scale,
                 SpriteEffects.None,
                 layerDepth);
         }

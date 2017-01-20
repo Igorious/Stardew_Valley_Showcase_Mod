@@ -17,7 +17,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             : base(items, capacity, rows, null, isItemEnabled)
         {
             _items = items;
-            this.SetField("itemChangeBehavior", new behaviorOnItemChange(ProcessItemChanged));
+            this.SetField<behaviorOnItemChange>("itemChangeBehavior", ProcessItemChanged);
             ItemsToGrabMenu.movePosition(0, (3 - rows) * Game1.tileSize);
         }
 

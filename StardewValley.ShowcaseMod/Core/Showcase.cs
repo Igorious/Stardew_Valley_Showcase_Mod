@@ -4,7 +4,6 @@ using Igorious.StardewValley.ShowcaseMod.ModConfig;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
-using Object = StardewValley.Object;
 
 namespace Igorious.StardewValley.ShowcaseMod.Core
 {
