@@ -20,8 +20,8 @@ namespace Igorious.StardewValley.DynamicApi2.Services
         private ClassMapper()
         {
             SaveEvents.AfterLoad += (s, e) => ActivateMapping();
-            SavingEvents.BeforeSaving += DeactivateMapping;
-            SavingEvents.AfterSaving += ActivateMapping;
+            SaveEvents.BeforeSave += (s, e) => DeactivateMapping();
+            SaveEvents.AfterSave += (s, e) => ActivateMapping();
             LocationEvents.CurrentLocationChanged += OnCurrentLocationChanged;
             LocationEvents.LocationObjectsChanged += OnLocationObjectsChanged;
             InventoryEvents.ActiveObjectChanged += OnObjectChanged;

@@ -13,6 +13,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
         private ShowcaseConfig Config { get; }
         private ItemFilter Filter { get; }
         private List<Item> Items => GetChest().items;
+        private int LastRotation { get; set; } = -1;
 
         public Showcase(int id) : base(id, Vector2.Zero)
         {
@@ -33,8 +34,8 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
         {
             if (justCheckingForActivity) return true;
             RecalculateItems();
-            var cellsCount = (Items.Count + Config.Rows - 1) / Config.Rows * Config.Rows;
-            Game1.activeClickableMenu = new ShowcaseContainer(Items, cellsCount, Config.Rows, Filter.IsPass);
+            var cellsCount = (Items.Count + GetRowsCount() - 1) / GetRowsCount() * GetRowsCount();
+            Game1.activeClickableMenu = new ShowcaseContainer(Items, cellsCount, GetRowsCount(), Filter.IsPass);
             return true;
         }
 
@@ -53,7 +54,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         private void RecalculateItems()
         {
-            var prefferedCount = Config.Rows * Config.Columns;
+            var prefferedCount = GetRowsCount() * GetColumnsCount();
             while (Items.Count > prefferedCount && Items.Remove(null)) { }
             while (Items.Count < prefferedCount)
             {
@@ -63,13 +64,43 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         private Chest GetChest()
         {
+            Chest chest;
             if (heldObject == null)
             {
-                var chest = new Chest(true);
-                heldObject = chest;
-                chest.items.AddRange(Enumerable.Repeat<Item>(null, Config.Rows * Config.Columns));
+                heldObject = chest = new Chest(true);
+                chest.items.AddRange(Enumerable.Repeat<Item>(null, GetRowsCount() * GetColumnsCount()));
+                LastRotation = currentRotation;
             }
-            return (Chest)heldObject;
+            else
+            {
+                chest = (Chest)heldObject;
+                UpdateRotation(chest);
+            }
+            return chest;
+        }
+
+        private bool IsHorizontal(int? rotation = null) => (rotation ?? currentRotation) % 2 == 1;
+
+        private int GetRowsCount(int? rotation = null) => IsHorizontal(rotation ?? currentRotation)? Config.Columns : Config.Rows;
+
+        private int GetColumnsCount(int? rotation = null) => IsHorizontal(rotation ?? currentRotation)? Config.Rows : Config.Columns;
+
+        private void UpdateRotation(Chest chest)
+        {
+            if (LastRotation == currentRotation) return;
+
+            var oldContainer = new ItemContainerProvider(chest.items.ToList(), GetRowsCount(LastRotation), GetColumnsCount(LastRotation));
+            var newContainer = new ItemContainerProvider(chest.items, GetRowsCount(), GetColumnsCount());
+
+            for (var i = 0; i < newContainer.Rows; ++i)
+            {
+                for (var j = 0; j < newContainer.Columns; ++j)
+                {
+                    newContainer[i, j] = oldContainer[j, oldContainer.Columns - 1 - i];
+                }
+            }
+
+            LastRotation = currentRotation;
         }
     }
 }

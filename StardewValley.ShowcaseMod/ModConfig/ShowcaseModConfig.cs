@@ -17,18 +17,20 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     SpriteIndex = 0,
                     ID = 1228,
                     Name = "Showcase",
-                    Bounds = new Bounds
+                    SpriteBounds = new Bounds
                     {
                         Top = -2,
                         Bottom = 5,
                         Left = 1,
                         Right = 1,
                     },
+                    TextureSize = new Size(2, 2),
                     Size = new Size(2, 2),
+                    BoundingBox = new Size(2, 2),
                     Price = 1000,
                     Columns = 3,
                     Rows = 3,
-                    Kind = "table",
+                    Kind = FurnitureKind.Table,
                     Filter = $"{ItemFilter.ShippableCategory}",
                 },
                 new ShowcaseConfig
@@ -36,28 +38,29 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     SpriteIndex = 2,
                     ID = 1230,
                     Name = "Wood Stand",
-                    Size = new Size(1, 2),
-                    Bounds = new Bounds
+                    TextureSize = new Size(2, 1),
+                    Size = new Size(2, 1),
+                    BoundingBox = new Size(2, 1),
+                    SpriteBounds = new Bounds
                     {
                         Top = 2,
                         Bottom = 14,
                     },
                     Price = 1000,
-                    Columns = 1,
-                    Rows = 1,
-                    Kind = "painting",
+                    Kind = FurnitureKind.Painting,
                     Scale = 0.85f,
                     Filter = $"{nameof(CategoryID.Fish)}",
                 },
                 new ShowcaseConfig
                 {
                     SpriteIndex = 3,
-                    SpritesCount = 2,
+                    TextureSize = new Size(3, 6),
+                    IsTwoLayer = true,
                     ID = 1826,
                     Name = "Chinese Showcase",
                     Size = new Size(3, 3),
-                    BoundingBox = new Size(3, 1),
-                    Bounds = new Bounds
+                    BoundingBox = new Size(1, 3),
+                    SpriteBounds = new Bounds
                     {
                         Top = 13,
                         Bottom = 23,
@@ -66,8 +69,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     },
                     Price = 1000,
                     Columns = 3,
-                    Rows = 1,
-                    Kind = "other",
+                    Kind = FurnitureKind.Other,
                     Scale = 0.80f,
                     Alpha = 0.60f,
                     Filter = $"{ItemFilter.ShippableCategory} !{nameof(CategoryID.Cooking)}",
@@ -77,15 +79,41 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     SpriteIndex = 9,
                     ID = 1231,
                     Name = "Old Shield",
-                    Size = new Size(1, 2),
-                    Bounds = new Bounds { Top = 2 },
+                    TextureSize = new Size(2, 1),
+                    Size = new Size(2, 1),
+                    BoundingBox = new Size(2, 1),
+                    SpriteBounds = new Bounds { Top = -2 },
                     Price = 1000,
-                    Columns = 1,
-                    Rows = 1,
-                    Kind = "painting",
-                    Scale = 1,
+                    Kind = FurnitureKind.Painting,
                     InverseLayouts = true,
-                    Filter = $"{nameof(CategoryID.Weapon)}",
+                    Filter = $"{nameof(CategoryID.Weapon)} {nameof(CategoryID.Tool)}",
+                },
+                new ShowcaseConfig
+                {
+                    SpriteIndex = 10,
+                    ID = 1832,
+                    Name = "Darkwood Dresser",
+                    TextureSize = new Size(3, 5),
+                    SpriteBounds = new Bounds
+                    {
+                        Top = -3,
+                        Left = 2,
+                        Right = 2,
+                        Bottom = 21,
+                    },
+                    AltSpriteBounds = new Bounds
+                    {
+                        Top = -3,
+                        Left = 2,
+                        Right = 5,
+                        Bottom = 24,
+                    },
+                    Price = 1000,
+                    Columns = 2,
+                    Kind = FurnitureKind.Dresser,
+                    Scale = 0.85f,
+                    Filter = $"{ItemFilter.ShippableCategory}",
+                    Rotations = 4,
                 },
             };
         }

@@ -11,6 +11,7 @@ namespace Igorious.StardewValley.DynamicApi2.Data
         public static TextureInfo Furnitures { get; } = new TextureInfo("Furniture", () => Furniture.furnitureTexture);
         public static TextureInfo Objects { get; } = new TextureInfo("Objects", () => Game1.objectSpriteSheet);
         public static TextureInfo Weapons { get; } = new TextureInfo("Weapons", () => Tool.weaponsTexture);
+        public static TextureInfo Tools { get; } = new TextureInfo("Tools", () => Game1.toolSpriteSheet);
 
         private readonly Func<Texture2D> _getTexture;
 

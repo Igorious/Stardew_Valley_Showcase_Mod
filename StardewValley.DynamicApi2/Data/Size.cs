@@ -5,7 +5,7 @@ namespace Igorious.StardewValley.DynamicApi2.Data
         public static Size Default => new Size(-1, -1);
 
         public Size() { }
-        public Size(int width, int height)
+        public Size(int height, int width)
         {
             Width = width;
             Height = height;

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Igorious.StardewValley.DynamicApi2.Constants;
 using Igorious.StardewValley.DynamicApi2.Data;
 using Newtonsoft.Json;
 
@@ -6,25 +7,34 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
 {
     public class ShowcaseConfig
     {
-        [JsonProperty(Required = Required.Always), DefaultValue(-1)]
+        [JsonProperty(Required = Required.Always)]
         public int ID { get; set; }
 
-        [JsonProperty(Required = Required.Always), DefaultValue("{Incognita}")]
+        [JsonProperty(Required = Required.Always)]
         public string Name { get; set; }
 
-        [JsonProperty(Required = Required.Always), DefaultValue(-1)]
+        [JsonProperty(Required = Required.Always, DefaultValueHandling = DefaultValueHandling.Include)]
         public int SpriteIndex { get; set; }
 
-        [DefaultValue(1)]
-        public int SpritesCount { get; set; } = 1;
+        [JsonProperty(Required = Required.Always, DefaultValueHandling = DefaultValueHandling.Include)]
+        public Size TextureSize { get; set; }
 
-        public Size Size { get; set; } = new Size(1, 1);
+        [DefaultValue(false)]
+        public bool IsTwoLayer { get; set; }
+
+        public Size Size { get; set; } = Size.Default;
+        public bool ShouldSerializeSize() => Size != Size.Default;
 
         public Size BoundingBox { get; set; } = Size.Default;
+        public bool ShouldSerializeBoundingBox() => BoundingBox != Size.Default;
 
         public int Price { get; set; }
 
-        public Bounds Bounds { get; set; } = new Bounds();
+        public Bounds SpriteBounds { get; set; } = Bounds.Empty;
+        public bool ShouldSerializeSpriteBounds() => SpriteBounds != Bounds.Empty;
+
+        public Bounds AltSpriteBounds { get; set; } = Bounds.Empty;
+        public bool ShouldSerializeAltSpriteBounds() => AltSpriteBounds != Bounds.Empty;
 
         [DefaultValue(1)]
         public int Rows { get; set; } = 1;
@@ -33,7 +43,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
         public int Columns { get; set; } = 1;
 
         [JsonProperty(Required = Required.Always)]
-        public string Kind { get; set; }
+        public FurnitureKind Kind { get; set; }
 
         [DefaultValue(1)]
         public float Scale { get; set; } = 1;
@@ -45,5 +55,8 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
         public bool InverseLayouts { get; set; }
 
         public string Filter { get; set; }
+
+        [DefaultValue(1)]
+        public int Rotations { get; set; } = 1;
     }
 }

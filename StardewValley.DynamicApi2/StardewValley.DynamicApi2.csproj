@@ -75,12 +75,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants\CategoryID.cs" />
+    <Compile Include="Constants\FurnitureKind.cs" />
     <Compile Include="DynamicConfiguration.cs" />
     <Compile Include="Data\FurnitureInfo.cs" />
     <Compile Include="Data\Size.cs" />
     <Compile Include="Events\InventoryEvents.cs" />
     <Compile Include="Events\ObjectEventArgs.cs" />
-    <Compile Include="Events\SavingEvents.cs" />
     <Compile Include="Extensions\BoolExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />

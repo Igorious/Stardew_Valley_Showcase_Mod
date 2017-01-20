@@ -6,11 +6,9 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 {
     internal class ItemContainerProvider
     {
-        private IReadOnlyList<Item> Items { get; }
-        private int Rows { get; }
-        private int Columns { get; }
+        private IList<Item> Items { get; }
 
-        public ItemContainerProvider(IReadOnlyList<Item> items, int rows, int columns)
+        public ItemContainerProvider(IList<Item> items, int rows, int columns)
         {
             Items = items;
             Rows = rows;
@@ -22,6 +20,8 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             RightColumn = GetRightColumn();
         }
 
+        public int Rows { get; }
+        public int Columns { get; }
         public int TopRow { get; }
         public int BottomRow { get; }
         public int LeftColumn { get; }
@@ -53,6 +53,12 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             {
                 var itemIndex = i * Columns + j;
                 return (itemIndex < Items.Count)? Items[itemIndex] : null;
+            }
+            set
+            {
+                var itemIndex = i * Columns + j;
+                if (itemIndex >= Items.Count) return;
+                Items[itemIndex] = value;
             }
         }
     }
