@@ -37,18 +37,25 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             GameEvents.LoadContent += OnLoadContent;
         }
 
-        public TextureOverrideModule RegisterModule<TModule>(string path) => RegisterModule(typeof(TModule).FullName, path);
+        public TextureModule RegisterModule<TModule>(string path) => RegisterModule(typeof(TModule).FullName, path);
 
-        public TextureOverrideModule RegisterModule(string module, string path)
+        public TextureModule RegisterModule(string module, string path)
         {
             _modulePaths.Add(module, path);
-            return new TextureOverrideModule(module);
+            return new TextureModule(module);
         }
 
         public TextureService OverrideFurniture(string module, TextureRect source, int target)
         {
             _furnitureOverrides.Add(target, new TextureOverrideInfo(module, source));
             return this;
+        }
+
+        public Texture2D LoadTexture(string module, string name)
+        {
+            var texture = TextureLoader.Instance.Load(Path.Combine(_modulePaths[module], $"{name}.png"));
+            SaveTexture(texture, _modulePaths[module], $"{name}.temp.png");
+            return texture;
         }
 
         private void OnLoadContent(object sender, EventArgs eventArgs)
@@ -103,13 +110,13 @@ namespace Igorious.StardewValley.DynamicApi2.Services
                 }
             }
 
-            SaveTexture(originalTexture, _modulePaths[spriteOverrides.First().Value.Module], info);
+            SaveTexture(originalTexture, _modulePaths[spriteOverrides.First().Value.Module], info.Name);
         }
 
         [Conditional("DEBUG")]
-        private void SaveTexture(Texture2D texture, string path, TextureInfo info)
+        private void SaveTexture(Texture2D texture, string path, string name)
         {
-            using (var imageStream = new FileStream(Path.Combine(path, $"{info.Name}.temp.png"), FileMode.OpenOrCreate))
+            using (var imageStream = new FileStream(Path.Combine(path, $"{name}.temp.png"), FileMode.OpenOrCreate))
             {
                 texture.SaveAsPng(imageStream, texture.Width, texture.Height);
             }

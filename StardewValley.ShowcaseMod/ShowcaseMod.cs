@@ -8,7 +8,9 @@ using Igorious.StardewValley.DynamicApi2.Services;
 using Igorious.StardewValley.ShowcaseMod.Core;
 using Igorious.StardewValley.ShowcaseMod.ModConfig;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Objects;
 
@@ -17,15 +19,17 @@ namespace Igorious.StardewValley.ShowcaseMod
     public class ShowcaseMod : Mod
     {
         private static ShowcaseModConfig Config { get; } = new ShowcaseModConfig();
+        private static TextureModule TextureModule { get; set; }
+        public static Texture2D GlowTexture { get; private set; }
 
         public override void Entry(IModHelper helper)
         {
             Config.Load(Helper.DirectoryPath);
 
             Config.Showcases.ForEach(s => ClassMapper.Instance.MapFurniture<Showcase>(s.ID));
-            
-            var textureModule = TextureService.Instance.RegisterModule<ShowcaseMod>(Path.Combine(Helper.DirectoryPath, "Resources"));
-            Config.Showcases.ForEach(s => textureModule.OverrideFurniture(new TextureRect(s.SpriteIndex, s.TextureSize.Width, s.TextureSize.Height), s.ID));
+
+            TextureModule = TextureService.Instance.RegisterModule<ShowcaseMod>(Path.Combine(Helper.DirectoryPath, "Resources"));
+            Config.Showcases.ForEach(s => TextureModule.OverrideFurniture(new TextureRect(s.SpriteIndex, s.TextureSize.Width, s.TextureSize.Height), s.ID));
 
             Config.Showcases.ForEach(s =>
                 DataService.Instance.RegisterFurniture(new FurnitureInfo
@@ -40,6 +44,11 @@ namespace Igorious.StardewValley.ShowcaseMod
                 }));
 
             Config.Showcases.ForEach(s => ShopService.Instance.AddFurniture(Locations.CarpentersShop, new ShopItemInfo(s.ID)));
+
+            GameEvents.LoadContent += (s, e) =>
+            {
+                GlowTexture = TextureModule.LoadTexture("Glow");
+            };
 
             ConsoleCommand.Register("list_furniture", "List furniture", OnListFurnitureCommand);
             ConsoleCommand.Register("player_addfurniture", "Add furniture", new[] { "ID" }, OnPlayerAddFurnitureCommand);

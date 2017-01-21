@@ -26,46 +26,47 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             return isRemoving ? OnItemRemoved(newItem, position, oldItem) : OnItemAdded(newItem, position, oldItem, container);
         }
 
-        private bool OnItemRemoved(Item newItem, int position, Item oldItem)
+        private bool OnItemRemoved(Item containerItem, int position, Item handItem)
         {
-            if (oldItem?.Stack > 1 && !oldItem.Equals(newItem))
+            if (handItem?.Stack > 1 && !handItem.Equals(containerItem))
             {
                 return false;
             }
 
-            var newCellItem = oldItem != null && !oldItem.Equals(newItem) ? newItem : null;
+            var newCellItem = handItem != null && !handItem.Equals(containerItem) ? containerItem : null;
             _items[position] = newCellItem;
             return true;
         }
 
-        private bool OnItemAdded(Item newItem, int position, Item oldItem, StorageContainer container)
+        private bool OnItemAdded(Item handItem, int position, Item containerItem, StorageContainer container)
         {
-            if (newItem.Stack > 1 || newItem.Stack == 1 && oldItem?.Stack == 1 && newItem.canStackWith(oldItem))
+            if (handItem.Stack > 1 || handItem.Stack == 1 && containerItem?.Stack == 1 && handItem.canStackWith(containerItem))
             {
-                if (oldItem != null)
+                if (containerItem != null)
                 {
-                    if (oldItem.canStackWith(newItem))
+                    if (containerItem.canStackWith(handItem))
                     {
                         container.ItemsToGrabMenu.actualInventory[position].Stack = 1;
+                        container.heldItem = containerItem;
                     }
                     else
                     {
-                        Utility.addItemToInventory(oldItem, position, container.ItemsToGrabMenu.actualInventory);
+                        Utility.addItemToInventory(containerItem, position, container.ItemsToGrabMenu.actualInventory);
+                        container.heldItem = handItem;
                     }
-                    container.heldItem = oldItem;
                     return false;
                 }
 
-                var num = newItem.Stack - 1;
-                var one = newItem.getOne();
-                one.Stack = num;
+                var newStack = handItem.Stack - 1;
+                var one = handItem.getOne();
+                one.Stack = newStack;
                 container.heldItem = one;
-                newItem.Stack = 1;
+                handItem.Stack = 1;
             }
 
             if (position < _items.Count)
             {
-                _items[position] = newItem;
+                _items[position] = handItem;
             }
             return true;
         }

@@ -40,7 +40,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         public override bool performObjectDropInAction(Object dropIn, bool probe, Farmer who)
         {
-            if (!Utility.highlightShippableObjects(dropIn)) return false;
+            if (!Filter.IsPass(dropIn)) return false;
             RecalculateItems();
             var emptyCellIndex = Items.IndexOf(null);
             if (emptyCellIndex == -1) return false;

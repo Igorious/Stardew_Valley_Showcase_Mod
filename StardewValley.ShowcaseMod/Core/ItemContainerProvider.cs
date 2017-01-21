@@ -29,22 +29,22 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         private int GetTopRow()
         {
-            return Enumerable.Range(0, Rows).First(i => Enumerable.Range(0, Columns).Any(j => this[i, j] != null));
+            return Enumerable.Range(0, Rows).FirstOrDefault(i => Enumerable.Range(0, Columns).Any(j => this[i, j] != null));
         }
 
         private int GetBottomRow()
         {
-            return Enumerable.Range(0, Rows).Reverse().First(i => Enumerable.Range(0, Columns).Any(j => this[i, j] != null));
+            return Enumerable.Range(0, Rows).Reverse().FirstOrDefault(i => Enumerable.Range(0, Columns).Any(j => this[i, j] != null));
         }
 
         private int GetLeftColumn()
         {
-            return Enumerable.Range(0, Columns).First(j => Enumerable.Range(0, Rows).Any(i => this[i, j] != null));
+            return Enumerable.Range(0, Columns).FirstOrDefault(j => Enumerable.Range(0, Rows).Any(i => this[i, j] != null));
         }
 
         private int GetRightColumn()
         {
-            return Enumerable.Range(0, Columns).Reverse().First(j => Enumerable.Range(0, Rows).Any(i => this[i, j] != null));
+            return Enumerable.Range(0, Columns).Reverse().FirstOrDefault(j => Enumerable.Range(0, Rows).Any(i => this[i, j] != null));
         }
 
         public Item this[int i, int j]

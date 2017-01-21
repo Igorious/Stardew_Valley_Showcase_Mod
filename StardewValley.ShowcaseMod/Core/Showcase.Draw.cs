@@ -1,12 +1,15 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Igorious.StardewValley.DynamicApi2.Constants;
 using Igorious.StardewValley.DynamicApi2.Data;
+using Igorious.StardewValley.DynamicApi2.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Locations;
 using StardewValley.Objects;
 using StardewValley.Tools;
-using Object = StardewValley.Object;
 
 namespace Igorious.StardewValley.ShowcaseMod.Core
 {
@@ -21,6 +24,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             var iconOffsetH = sourceRect.Height * scaleSize * iconScale;
             var offset = (TileSize - new Vector2(iconOffsetW, iconOffsetH)) / 2;
             Draw(spriteBatch, alpha, location + offset, scaleSize * iconScale, layerDepth);
+            UpdateLightSources();
         }
 
         public override void draw(SpriteBatch spriteBatch, int x, int y, float alpha = 1)
@@ -28,6 +32,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             var viewPosition = GetViewPosition(x, y);
             var layerDepth = (boundingBox.Bottom - 8) / 10000f;
             Draw(spriteBatch, alpha, viewPosition, Game1.pixelZoom, layerDepth);
+            UpdateLightSources();
         }
 
         private void Draw(SpriteBatch spriteBatch, float alpha, Vector2 viewPosition, float scaleSize, float layerDepth)
@@ -121,7 +126,9 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                     var item = itemProvider[i, j];
                     if (item == null) continue;
                     var tileDelta = new Vector2((j - itemProvider.LeftColumn) * horizontalItemOffset, (i - itemProvider.TopRow) * verticalItemOffset);
-                    DrawItem((dynamic)item, spriteBatch, viewPosition + offset + tileDelta * scaleSize, alpha, scaleSize, layerDepth);
+                    var itemViewPosition = viewPosition + offset + tileDelta * scaleSize;
+                    UpdateItemGlow(item, spriteBatch, itemViewPosition, alpha, scaleSize, layerDepth);
+                    DrawItem((dynamic)item, spriteBatch, itemViewPosition, alpha, scaleSize, layerDepth);
                     ChangeDepth(ref layerDepth);
                 }
             }
@@ -145,7 +152,109 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             DrawObjectSprite(item.ParentSheetIndex + 1, coloredObject.color, layerDepth + 0.0000001f);
         }
 
-        private static int ScytheID = 47;
+        private IDictionary<Item, LightSource> LightSources { get; } = new Dictionary<Item, LightSource>();
+
+        private void UpdateItemGlow(Item item, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, float layerDepth)
+        {
+            var color = GetItemGlowColor(item);
+
+            if (color == null) return;
+
+            var colorAlpha = color == Color.Black? 0.8f : 0.6f;
+
+            spriteBatch.Draw(
+                ShowcaseMod.GlowTexture,
+                viewPosition + TileSize / 2 * (scaleSize / Game1.pixelZoom),
+                ShowcaseMod.GlowTexture.Bounds,
+                color.Value * colorAlpha * alpha,
+                0,
+                ShowcaseMod.GlowTexture.Bounds.Center.ToVector(),
+                4f * (scaleSize / Game1.pixelZoom),
+                SpriteEffects.None,
+                layerDepth - 0.00000009f);
+
+            if (color == Color.Black) return;
+
+            if (!LightSources.TryGetValue(item, out var light))
+            {
+                light = new LightSource(LightSource.lantern, Vector2.Zero, 32f / Game1.options.lightingQuality);
+                LightSources.Add(item, light);
+            }
+            light.position = viewPosition + new Vector2(Game1.viewport.X, Game1.viewport.Y) + TileSize / 2;
+        }
+
+        private Color? GetItemGlowColor(Item item)
+        {
+            if (item is Object o)
+            {
+                switch ((ObjectID)o.ParentSheetIndex)
+                {
+                    case ObjectID.PrismaticShard:
+                        return Color.White;
+
+                    case ObjectID.VoidEssence:
+                        return Color.Black;
+
+                    case ObjectID.SolarEssence:
+                        return Color.Yellow;
+                }
+
+                switch (o.quality)
+                {
+                    case 3:
+                        return Color.Lerp(Color.Purple, Color.Magenta, 0.3f);
+                    case 2:
+                        return Color.Yellow;
+                    default:
+                        return null;
+                }
+            }
+
+            if (item is MeleeWeapon weapon)
+            {
+                switch ((WeaponID)weapon.indexOfMenuItemView)
+                {
+                    case WeaponID.HolyBlade:
+                        return Color.White;
+
+                    case WeaponID.GalaxySword:
+                    case WeaponID.GalaxyDagger:
+                    case WeaponID.GalaxyHammer:
+                        return Color.Lerp(Color.Purple, Color.Magenta, 0.3f);
+
+                    case WeaponID.DarkSword:
+                        return Color.Black;
+                        
+                    case WeaponID.LavaKatana:
+                        return Color.Red;
+
+                    case WeaponID.NeptunesGlaive:
+                        return Color.Aqua;
+
+                    case WeaponID.ForestSword:
+                        return Color.Green;
+                }
+            }
+
+            return null;
+        }
+
+        private void UpdateLightSources()
+        {
+            var isPlaced = (Game1.currentLocation as DecoratableLocation)?.furniture.Contains(this) ?? false;
+            foreach (var kv in LightSources.ToList())
+            {
+                if (Items.Contains(kv.Key) && isPlaced)
+                {
+                    Game1.currentLightSources.Add(kv.Value);
+                }
+                else
+                {
+                    LightSources.Remove(kv.Key);
+                    Game1.currentLightSources.Remove(kv.Value);
+                }
+            }
+        }
 
         private void DrawItem(Tool tool, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, float layerDepth)
         {
@@ -160,7 +269,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             bool IsSwordLike()
             {
                 var weaponType = (tool as MeleeWeapon)?.type;
-                return (tool is Sword) || (weaponType != null && weaponType != MeleeWeapon.club && tool.indexOfMenuItemView != ScytheID);
+                return (tool is Sword) || (weaponType != null && weaponType != MeleeWeapon.club && tool.indexOfMenuItemView != (int)WeaponID.Scythe);
             }
 
             bool IsWeapon() => (tool is MeleeWeapon) || (tool is Slingshot);

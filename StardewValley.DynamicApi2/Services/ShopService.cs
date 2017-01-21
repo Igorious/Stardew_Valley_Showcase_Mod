@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Igorious.StardewValley.DynamicApi2.Data;
-using Igorious.StardewValley.DynamicApi2.Extensions;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -40,21 +39,17 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             var locationName = Game1.currentLocation?.Name;
             if (!Shops.Contains(locationName) || !(args.NewMenu is ShopMenu shopMenu)) return;
 
-            var itemsForSale = shopMenu.GetField<List<Item>>("forSale");
-            var itemsPriceAndStock = shopMenu.GetField<Dictionary<Item, int[]>>("itemPriceAndStock");
-
-            AddItems(locationName, itemsForSale, itemsPriceAndStock, ShopFurniture, si => new Furniture(si.ID, Vector2.Zero));
+            var menuProxy = new ShopMenuProxy(shopMenu);
+            AddItems(locationName, menuProxy, ShopFurniture, si => new Furniture(si.ID, Vector2.Zero));
             // TODO: Other items.
         }
 
-        private void AddItems(string locationName, ICollection<Item> itemsForSale, IDictionary<Item, int[]> itemsPriceAndStock, IDictionary<string, IList<ShopItemInfo>> shopItemsInfo, Func<ShopItemInfo, Object> createItem)
+        private void AddItems(string locationName, ShopMenuProxy shopMenu, IDictionary<string, IList<ShopItemInfo>> shopItemsInfo, Func<ShopItemInfo, Object> createItem)
         {
             if (!shopItemsInfo.TryGetValue(locationName, out var shopItems)) return;
             foreach (var shopItem in shopItems)
             {
-                var item = createItem(shopItem);
-                itemsForSale.Add(item);
-                itemsPriceAndStock.Add(item, new[] { item.salePrice(), int.MaxValue });
+                shopMenu.AddItem(createItem(shopItem));
             }
         }
     }
