@@ -201,9 +201,9 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
                 switch (o.quality)
                 {
-                    case 3:
+                    case bestQuality:
                         return Color.Lerp(Color.Purple, Color.Magenta, 0.3f);
-                    case 2:
+                    case highQuality:
                         return Color.Yellow;
                     default:
                         return null;
