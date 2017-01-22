@@ -82,7 +82,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     TextureSize = new Size(2, 1),
                     Size = new Size(2, 1),
                     BoundingBox = new Size(2, 1),
-                    SpriteBounds = new Bounds { Top = -2 },
+                    SpriteBounds = new Bounds { Top = 2 },
                     Price = 1000,
                     Kind = FurnitureKind.Painting,
                     InverseLayouts = true,

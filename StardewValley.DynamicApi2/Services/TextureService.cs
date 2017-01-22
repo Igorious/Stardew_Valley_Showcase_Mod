@@ -54,7 +54,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
         public Texture2D LoadTexture(string module, string name)
         {
             var texture = TextureLoader.Instance.Load(Path.Combine(_modulePaths[module], $"{name}.png"));
-            SaveTexture(texture, _modulePaths[module], $"{name}.temp.png");
+            SaveTempTexture(texture, _modulePaths[module], name);
             return texture;
         }
 
@@ -110,11 +110,11 @@ namespace Igorious.StardewValley.DynamicApi2.Services
                 }
             }
 
-            SaveTexture(originalTexture, _modulePaths[spriteOverrides.First().Value.Module], info.Name);
+            SaveTempTexture(originalTexture, _modulePaths[spriteOverrides.First().Value.Module], info.Name);
         }
 
         [Conditional("DEBUG")]
-        private void SaveTexture(Texture2D texture, string path, string name)
+        private void SaveTempTexture(Texture2D texture, string path, string name)
         {
             using (var imageStream = new FileStream(Path.Combine(path, $"{name}.temp.png"), FileMode.OpenOrCreate))
             {
