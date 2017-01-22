@@ -74,10 +74,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleCommand.cs" />
     <Compile Include="Constants\CategoryID.cs" />
     <Compile Include="Constants\FurnitureKind.cs" />
     <Compile Include="Constants\ObjectID.cs" />
     <Compile Include="Constants\WeaponID.cs" />
+    <Compile Include="Contracts\IInitializable.cs" />
     <Compile Include="DynamicConfiguration.cs" />
     <Compile Include="Data\FurnitureInfo.cs" />
     <Compile Include="Data\Size.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Extensions\BoolExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
+    <Compile Include="Extensions\ModExtensions.cs" />
     <Compile Include="Extensions\PointExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Json\JsonPlainArrayConverter.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="Data\TextureRect.cs" />
     <Compile Include="Services\Traverser.cs" />
     <Compile Include="Services\ClassMapper.cs" />
+    <Compile Include="Utils\ColorHelper.cs" />
     <Compile Include="Utils\Constructor.cs" />
     <Compile Include="Utils\Log.cs" />
   </ItemGroup>

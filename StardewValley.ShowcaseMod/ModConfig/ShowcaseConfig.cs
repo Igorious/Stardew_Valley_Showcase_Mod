@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using Igorious.StardewValley.DynamicApi2.Constants;
 using Igorious.StardewValley.DynamicApi2.Data;
+using Igorious.StardewValley.ShowcaseMod.Constants;
+using Igorious.StardewValley.ShowcaseMod.Data;
 using Newtonsoft.Json;
 
 namespace Igorious.StardewValley.ShowcaseMod.ModConfig
@@ -15,6 +17,9 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
 
         [JsonProperty(Required = Required.Always, DefaultValueHandling = DefaultValueHandling.Include)]
         public int SpriteIndex { get; set; }
+
+        [DefaultValue(TextureKind.Local)]
+        public TextureKind Texture { get; set; } = TextureKind.Local;
 
         [JsonProperty(Required = Required.Always, DefaultValueHandling = DefaultValueHandling.Include)]
         public Size TextureSize { get; set; }
@@ -58,5 +63,8 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
 
         [DefaultValue(1)]
         public int Rotations { get; set; } = 1;
+
+        [DefaultValue(ShowcaseLayoutKind.Fixed)]
+        public ShowcaseLayoutKind Layout { get; set; } = ShowcaseLayoutKind.Fixed;
     }
 }

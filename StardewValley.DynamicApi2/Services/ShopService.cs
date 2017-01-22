@@ -14,6 +14,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
     {
         private static readonly Lazy<ShopService> Lazy = new Lazy<ShopService>(() => new ShopService());
         public static ShopService Instance => Lazy.Value;
+        public event EventHandler<EventArgsClickableMenuChanged> MenuItemsAdded;
 
         private ISet<string> Shops { get; } = new HashSet<string>();
         private IDictionary<string, IList<ShopItemInfo>> ShopFurniture { get; } = new Dictionary<string, IList<ShopItemInfo>>();
@@ -42,6 +43,8 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             var menuProxy = new ShopMenuProxy(shopMenu);
             AddItems(locationName, menuProxy, ShopFurniture, si => new Furniture(si.ID, Vector2.Zero));
             // TODO: Other items.
+
+            MenuItemsAdded?.Invoke(this, args);
         }
 
         private void AddItems(string locationName, ShopMenuProxy shopMenu, IDictionary<string, IList<ShopItemInfo>> shopItemsInfo, Func<ShopItemInfo, Object> createItem)

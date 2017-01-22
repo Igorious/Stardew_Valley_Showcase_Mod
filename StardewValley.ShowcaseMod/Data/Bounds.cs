@@ -1,4 +1,4 @@
-namespace Igorious.StardewValley.ShowcaseMod.ModConfig
+namespace Igorious.StardewValley.ShowcaseMod.Data
 {
     public sealed class Bounds
     {

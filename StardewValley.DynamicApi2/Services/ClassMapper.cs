@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Igorious.StardewValley.DynamicApi2.Contracts;
 using Igorious.StardewValley.DynamicApi2.Events;
 using Igorious.StardewValley.DynamicApi2.Extensions;
 using Igorious.StardewValley.DynamicApi2.Utils;
@@ -32,6 +33,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             PlayerEvents.InventoryChanged += OnInventoryChanged;
             MenuEvents.MenuChanged += MenuEventsOnMenuChanged;
             MenuEvents.MenuClosed += MenuEventsOnMenuClosed;
+            ShopService.Instance.MenuItemsAdded += OnMenuItemsAdded;
         }
 
         public ClassMapper MapFurniture<T>(int id) where T : Furniture
@@ -63,6 +65,19 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             if (!(e.NewMenu is ShopMenu shopMenu)) return;
 
             CurrentShopMenu = shopMenu;
+            WrapMenuItems();
+
+            GameEvents.UpdateTick += OnMenuUpdateTick;
+        }
+
+        private void OnMenuItemsAdded(object sender, EventArgsClickableMenuChanged e)
+        {
+            if (e.NewMenu != CurrentShopMenu) return;
+            WrapMenuItems();
+        }
+
+        private void WrapMenuItems()
+        {
             var menuProxy = new ShopMenuProxy(CurrentShopMenu);
             for (var i = 0; i < menuProxy.ItemsForSale.Count; ++i)
             {
@@ -80,8 +95,6 @@ namespace Igorious.StardewValley.DynamicApi2.Services
                 }
                 Log.Trace("Wrapped item in menu.");
             }
-
-            GameEvents.UpdateTick += OnMenuUpdateTick;
         }
 
         private void OnMenuUpdateTick(object sender, EventArgs e)
@@ -149,6 +162,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
 
             var customObject = new Constructor<int, Object>(customType).Invoke(basicObject.ParentSheetIndex);
             Cloner.Instance.CopyData(basicObject, customObject);
+            (customObject as IInitializable)?.Initialize();
             return customObject;
         }
 

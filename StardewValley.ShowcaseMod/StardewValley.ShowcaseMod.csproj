@@ -71,17 +71,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleCommand.cs" />
+    <Compile Include="ConfigDataConverter.cs" />
+    <Compile Include="Constants\TextureKind.cs" />
+    <Compile Include="Core\Layouts\IShowcaseLayout.cs" />
     <Compile Include="Core\ItemFilter.cs" />
     <Compile Include="Core\Showcase.Draw.cs" />
-    <Compile Include="Core\ItemContainerProvider.cs" />
-    <Compile Include="ModConfig\Bounds.cs" />
+    <Compile Include="Core\ItemGridProvider.cs" />
+    <Compile Include="Core\Layouts\ShowcaseAutoLayout.cs" />
+    <Compile Include="Core\Layouts\ShowcaseFixedLayout.cs" />
+    <Compile Include="Core\Layouts\ShowcaseGridLayoutBase.cs" />
+    <Compile Include="Data\Bounds.cs" />
     <Compile Include="Core\Showcase.cs" />
+    <Compile Include="Commands\ListFurnitureCommand.cs" />
+    <Compile Include="ModConfig\GlowConfig.cs" />
+    <Compile Include="Data\GlowEffect.cs" />
     <Compile Include="ModConfig\ShowcaseConfig.cs" />
     <Compile Include="Core\ShowcaseContainer.cs" />
+    <Compile Include="Constants\ShowcaseLayoutKind.cs" />
+    <Compile Include="Commands\PlayerAddFurnitureCommand.cs" />
+    <Compile Include="Commands\PlayerUpgradeToolCommand.cs" />
+    <Compile Include="Commands\PlayerWhatInHandsCommand.cs" />
     <Compile Include="ShowcaseMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModConfig\ShowcaseModConfig.cs" />
+    <Compile Include="Constants\TextureNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

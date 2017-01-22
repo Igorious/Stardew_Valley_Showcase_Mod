@@ -2,12 +2,18 @@ using System.Collections.Generic;
 using Igorious.StardewValley.DynamicApi2;
 using Igorious.StardewValley.DynamicApi2.Constants;
 using Igorious.StardewValley.DynamicApi2.Data;
+using Igorious.StardewValley.ShowcaseMod.Constants;
 using Igorious.StardewValley.ShowcaseMod.Core;
+using Igorious.StardewValley.ShowcaseMod.Data;
+using Microsoft.Xna.Framework;
 
 namespace Igorious.StardewValley.ShowcaseMod.ModConfig
 {
-    public class ShowcaseModConfig : DynamicConfiguration
+    public sealed class ShowcaseModConfig : DynamicConfiguration
     {
+        public List<ShowcaseConfig> Showcases { get; set; } = new List<ShowcaseConfig>();
+        public GlowConfig Glows { get; set; } = new GlowConfig();
+
         public override void CreateDefaultConfiguration()
         {
             Showcases = new List<ShowcaseConfig>
@@ -32,6 +38,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Rows = 3,
                     Kind = FurnitureKind.Table,
                     Filter = $"{ItemFilter.ShippableCategory}",
+                    Layout = ShowcaseLayoutKind.Auto,
                 },
                 new ShowcaseConfig
                 {
@@ -115,9 +122,60 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Filter = $"{ItemFilter.ShippableCategory}",
                     Rotations = 4,
                 },
+                new ShowcaseConfig
+                {
+                    SpriteIndex = 1391,
+                    Texture = TextureKind.Global,
+                    ID = -1,
+                    Name = "Oak Small Table",
+                    TextureSize = Size.Default,
+                    Size = new Size(2, 1),
+                    BoundingBox = new Size(1, 1),
+                    Scale = 0.875f,
+                    SpriteBounds = new Bounds
+                    {
+                        Top = 4,
+                        Bottom = 14,
+                        Left = 1,
+                        Right = 1,
+                    },
+                    Price = 1000,
+                    Kind = FurnitureKind.Table,
+                    Filter = $"{ItemFilter.ShippableCategory}",
+                },
+            };
+
+            var iridiumGlow = Color.Lerp(Color.Purple, Color.Magenta, 0.3f);
+            Glows = new GlowConfig
+            {
+                IridiumQualityGlow = new GlowEffect(iridiumGlow),
+                GoldQualityGlow = new GlowEffect(Color.Yellow),
+                Glows = new List<GlowEffect>
+                {
+                    new GlowEffect(CategoryID.Weapon, (int)WeaponID.GalaxySword, iridiumGlow),
+                    new GlowEffect(CategoryID.Weapon, (int)WeaponID.GalaxyDagger, iridiumGlow),
+                    new GlowEffect(CategoryID.Weapon, (int)WeaponID.GalaxyHammer, iridiumGlow),
+                    new GlowEffect(CategoryID.Weapon, (int)WeaponID.HolyBlade, Color.White),
+                    new GlowEffect(CategoryID.Weapon, (int)WeaponID.DarkSword, Color.Black),
+                    new GlowEffect(CategoryID.Weapon, (int)WeaponID.LavaKatana, Color.Red),
+                    new GlowEffect(CategoryID.Weapon, (int)WeaponID.NeptunesGlaive, Color.Aqua),
+                    new GlowEffect(CategoryID.Weapon, (int)WeaponID.ForestSword, Color.Green),
+
+                    new GlowEffect((int)ObjectID.VoidEssence, Color.Black),
+                    new GlowEffect((int)ObjectID.VoidEgg, Color.Black),
+                    new GlowEffect((int)ObjectID.VoidMayonnaise, Color.Black),
+                    new GlowEffect((int)ObjectID.VoidSalmon, Color.Black),
+
+                    new GlowEffect((int)ObjectID.SolarEssence, Color.Yellow),
+
+                    new GlowEffect((int)ObjectID.FireQuartz, Color.DarkRed),
+                    new GlowEffect((int)ObjectID.FrozenTear, Color.Aqua),
+                    new GlowEffect((int)ObjectID.Emerald, Color.Green),
+                    new GlowEffect((int)ObjectID.Diamond, Color.SkyBlue),
+                    new GlowEffect((int)ObjectID.Ruby, Color.Red),
+                    new GlowEffect((int)ObjectID.PrismaticShard, Color.White),
+                },
             };
         }
-
-        public List<ShowcaseConfig> Showcases { get; set; } = new List<ShowcaseConfig>();
     }
 }
