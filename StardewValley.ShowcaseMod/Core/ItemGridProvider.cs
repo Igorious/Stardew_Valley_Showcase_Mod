@@ -22,6 +22,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
         public bool IsHorizontal => (CurrentRotation != -1) && (CurrentRotation % 2 == 1);
         public int Rows => IsHorizontal? InitialColumns : InitialRows;
         public int Columns => IsHorizontal? InitialRows : InitialColumns;
+        public int Capacity => Items.Count;
 
         public ItemGridProvider Clone(int newRotation)
         {
@@ -102,10 +103,6 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                 default:
                     itemIndex = Columns * i + j;
                     break;
-            }
-            if (itemIndex < 0 || itemIndex > Items.Count)
-            {
-                //
             }
             return itemIndex;
         }

@@ -15,14 +15,12 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
         [JsonProperty(Required = Required.Always)]
         public string Name { get; set; }
 
-        [JsonProperty(Required = Required.Always, DefaultValueHandling = DefaultValueHandling.Include)]
-        public int SpriteIndex { get; set; }
+        public string Description { get; set; }
 
-        [DefaultValue(TextureKind.Local)]
-        public TextureKind Texture { get; set; } = TextureKind.Local;
+        [JsonProperty(Required = Required.Always)]
+        public SpriteInfo Sprite { get; set; }
 
-        [JsonProperty(Required = Required.Always, DefaultValueHandling = DefaultValueHandling.Include)]
-        public Size TextureSize { get; set; }
+        public SpriteInfo Tint { get; set; }
 
         [DefaultValue(false)]
         public bool IsTwoLayer { get; set; }

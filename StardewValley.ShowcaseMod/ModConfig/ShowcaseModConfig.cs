@@ -13,6 +13,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
     {
         public List<ShowcaseConfig> Showcases { get; set; } = new List<ShowcaseConfig>();
         public GlowConfig Glows { get; set; } = new GlowConfig();
+        public List<RotationEffect> RotationEffects { get; set; } = new List<RotationEffect>();
 
         public override void CreateDefaultConfiguration()
         {
@@ -20,9 +21,9 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
             {
                 new ShowcaseConfig
                 {
-                    SpriteIndex = 0,
                     ID = 1228,
                     Name = "Showcase",
+                    Sprite = new SpriteInfo(0),
                     SpriteBounds = new Bounds
                     {
                         Top = -2,
@@ -30,7 +31,6 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                         Left = 1,
                         Right = 1,
                     },
-                    TextureSize = new Size(2, 2),
                     Size = new Size(2, 2),
                     BoundingBox = new Size(2, 2),
                     Price = 1000,
@@ -42,10 +42,9 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                 },
                 new ShowcaseConfig
                 {
-                    SpriteIndex = 2,
                     ID = 1230,
                     Name = "Wood Stand",
-                    TextureSize = new Size(2, 1),
+                    Sprite = new SpriteInfo(2),
                     Size = new Size(2, 1),
                     BoundingBox = new Size(2, 1),
                     SpriteBounds = new Bounds
@@ -60,11 +59,10 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                 },
                 new ShowcaseConfig
                 {
-                    SpriteIndex = 3,
-                    TextureSize = new Size(3, 6),
                     IsTwoLayer = true,
                     ID = 1826,
                     Name = "Chinese Showcase",
+                    Sprite = new SpriteInfo(3),
                     Size = new Size(3, 3),
                     BoundingBox = new Size(1, 3),
                     SpriteBounds = new Bounds
@@ -83,10 +81,9 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                 },
                 new ShowcaseConfig
                 {
-                    SpriteIndex = 9,
                     ID = 1231,
                     Name = "Old Shield",
-                    TextureSize = new Size(2, 1),
+                    Sprite = new SpriteInfo(9),
                     Size = new Size(2, 1),
                     BoundingBox = new Size(2, 1),
                     SpriteBounds = new Bounds { Top = 2 },
@@ -97,10 +94,9 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                 },
                 new ShowcaseConfig
                 {
-                    SpriteIndex = 10,
                     ID = 1832,
                     Name = "Darkwood Dresser",
-                    TextureSize = new Size(3, 5),
+                    Sprite = new SpriteInfo(10),
                     SpriteBounds = new Bounds
                     {
                         Top = -3,
@@ -124,11 +120,10 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                 },
                 new ShowcaseConfig
                 {
-                    SpriteIndex = 1391,
-                    Texture = TextureKind.Global,
                     ID = -1,
                     Name = "Oak Small Table",
-                    TextureSize = Size.Default,
+                    Sprite = new SpriteInfo(1391, TextureKind.Global),
+                    Tint = new SpriteInfo(15),
                     Size = new Size(2, 1),
                     BoundingBox = new Size(1, 1),
                     Scale = 0.875f,
@@ -175,6 +170,45 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     new GlowEffect((int)ObjectID.Ruby, Color.Red),
                     new GlowEffect((int)ObjectID.PrismaticShard, Color.White),
                 },
+            };
+
+            RotationEffects = new List<RotationEffect>
+            {
+                new RotationEffect((int)ObjectID.Wine, -1),
+                new RotationEffect((int)ObjectID.Juice, -1),
+                new RotationEffect((int)ObjectID.Mead, -1),
+
+                new RotationEffect(CategoryID.Fish, 1),
+                new RotationEffect((int)ObjectID.Pufferfish, 0),
+                new RotationEffect((int)ObjectID.Eel, 0),
+                new RotationEffect((int)ObjectID.Octopus, 0),
+                new RotationEffect((int)ObjectID.Squid, 0),
+                new RotationEffect((int)ObjectID.LavaEel, 0),
+                new RotationEffect((int)ObjectID.Angler, 0),
+                new RotationEffect((int)ObjectID.Glacierfish, 0),
+                new RotationEffect((int)ObjectID.MutantCarp, 0),
+                new RotationEffect((int)ObjectID.SeaCucumber, 0),
+                new RotationEffect((int)ObjectID.SuperCucumber, 0),
+
+                new RotationEffect((int)ObjectID.Crab, 0),
+                new RotationEffect((int)ObjectID.Cockle, 0),
+                new RotationEffect((int)ObjectID.Shrimp, 0),
+                new RotationEffect((int)ObjectID.Snail, 0),
+                new RotationEffect((int)ObjectID.Periwinkle, 1),
+                new RotationEffect((int)ObjectID.Oyster, 0),
+
+                new RotationEffect(CategoryID.Tool, -1),
+                new RotationEffect(CategoryID.Tool, (int)ToolID.WateringCan, 0),
+                new RotationEffect(CategoryID.Tool, (int)ToolID.MilkPail, 0),
+                new RotationEffect(CategoryID.Tool, (int)ToolID.Shears, 1),
+                new RotationEffect(CategoryID.Tool, (int)ToolID.ReturnScepter, -1),
+                new RotationEffect(CategoryID.Tool, (int)ToolID.Pan, 0),
+                
+                new RotationEffect(CategoryID.Weapon, 3),
+                new RotationEffect(CategoryID.Weapon, (int)WeaponID.Slingshot, 0),
+                new RotationEffect(CategoryID.Weapon, (int)WeaponID.MasterSlingshot, 0),
+                new RotationEffect(CategoryID.Weapon, (int)WeaponID.GalaxySlingshot, 0),
+                new RotationEffect(CategoryID.Weapon, (int)WeaponID.Scythe, -1),
             };
         }
     }

@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Igorious.StardewValley.DynamicApi2.Contracts;
 using Igorious.StardewValley.DynamicApi2.Data;
 using Igorious.StardewValley.ShowcaseMod.Constants;
+using Igorious.StardewValley.ShowcaseMod.Data;
 using Igorious.StardewValley.ShowcaseMod.ModConfig;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,18 +19,18 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
         private GlowConfig GlowConfig { get; }
         private ItemFilter Filter { get; }
         private ItemGridProvider ItemProvider { get; set; }
-        private Texture2D FurnitureTexture { get; }
+        private Texture2D LocalFurnitureTexture { get; }
         private Texture2D GlowTexture { get; }
-        
+        private IReadOnlyCollection<RotationEffect> RotationEffects { get; }
+
         public Showcase(int id) : base(id, Vector2.Zero)
         {
             Config = ShowcaseMod.GetShowcaseConfig(ParentSheetIndex);
             GlowConfig = ShowcaseMod.Config.Glows;
             Filter = new ItemFilter(Config.Filter);
-            FurnitureTexture = Config.Texture == TextureKind.Local
-                ? ShowcaseMod.TextureModule.GetTexture(TextureNames.Furniture)
-                : furnitureTexture;
+            LocalFurnitureTexture = ShowcaseMod.TextureModule.GetTexture(TextureNames.Furniture);
             GlowTexture = ShowcaseMod.TextureModule.GetTexture(TextureNames.Glow);
+            RotationEffects = ShowcaseMod.Config.RotationEffects;
         }
 
         public override bool clicked(Farmer who)
@@ -45,10 +47,9 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             if (justCheckingForActivity) return true;
 
             ItemProvider.Recalculate();
-            var internalItems = ItemProvider.GetInternalList();
             var rows = ItemProvider.Rows;
-            var cellsCount = (internalItems.Count + rows - 1) / rows * rows;
-            Game1.activeClickableMenu = new ShowcaseContainer(internalItems, cellsCount, rows, Filter.IsPass);
+            var cellsCount = (ItemProvider.Capacity + rows - 1) / rows * rows;
+            Game1.activeClickableMenu = new ShowcaseContainer(this, ItemProvider.GetInternalList(), cellsCount, rows, Filter.IsPass, Config.Tint != null);
             return true;
         }
 
@@ -65,11 +66,22 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             return true;
         }
 
+        private Texture2D GetTexture(SpriteInfo spriteInfo)
+        {
+            return (spriteInfo.Kind == TextureKind.Local)? LocalFurnitureTexture : furnitureTexture;
+        }
+
+        private Rectangle GetSourceRect(SpriteInfo spriteInfo, int tileWidth, int tileHeigth)
+        {
+            return TextureInfo.Furnitures.GetSourceRect(GetTexture(spriteInfo), spriteInfo.Index, tileWidth, tileHeigth);
+        }
+
         public void Initialize()
         {
-            defaultSourceRect = sourceRect = TextureInfo.Furnitures.GetSourceRect(
-                FurnitureTexture, 
-                Config.SpriteIndex,
+            description = Config.Description ?? description;
+
+            defaultSourceRect = sourceRect = GetSourceRect(
+                Config.Sprite, 
                 defaultSourceRect.Width / spriteSheetTileSize,
                 defaultSourceRect.Height / spriteSheetTileSize);
 

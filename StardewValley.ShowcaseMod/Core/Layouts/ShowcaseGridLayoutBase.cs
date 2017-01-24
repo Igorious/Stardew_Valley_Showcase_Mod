@@ -42,11 +42,11 @@ namespace Igorious.StardewValley.ShowcaseMod.Core.Layouts
             var minRequiredWidthDelta = (workWidth - SpriteSheetTileSize * Config.Scale) / 2;
             var minRequiredHeightDelta = (workHeigth - SpriteSheetTileSize * Config.Scale) / 2;
 
-            var leftEmptyOffset = Math.Min(0, minRequiredWidthDelta);
-            var topEmptyOffset = Math.Min(0, minRequiredHeightDelta);
+            var leftEmptyOffset = (minRequiredWidthDelta > 0 && columnsCount > 1)? 0 : minRequiredWidthDelta;
+            var topEmptyOffset = (minRequiredHeightDelta > 0 && rowsCount > 1)? 0 : minRequiredHeightDelta;
 
-            HorizontalItemOffset = columnsCount > 1 ? (workWidth - leftEmptyOffset * 2 - SpriteSheetTileSize * Config.Scale) / (columnsCount - 1) : 0;
-            VerticalItemOffset = rowsCount > 1 ? (workHeigth - topEmptyOffset * 2 - SpriteSheetTileSize * Config.Scale) / (rowsCount - 1) : 0;
+            HorizontalItemOffset = (columnsCount > 1)? (workWidth - leftEmptyOffset * 2 - SpriteSheetTileSize * Config.Scale) / (columnsCount - 1) : 0;
+            VerticalItemOffset = (rowsCount > 1)? (workHeigth - topEmptyOffset * 2 - SpriteSheetTileSize * Config.Scale) / (rowsCount - 1) : 0;
 
             var isFlipped = (ItemProvider.CurrentRotation == 3);
             Offset = new Vector2((isFlipped ? bounds.Right : bounds.Left) + leftEmptyOffset, bounds.Top + topEmptyOffset) * ScaleSize;

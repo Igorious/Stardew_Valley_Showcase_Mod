@@ -80,9 +80,12 @@
     <Compile Include="Core\Layouts\ShowcaseAutoLayout.cs" />
     <Compile Include="Core\Layouts\ShowcaseFixedLayout.cs" />
     <Compile Include="Core\Layouts\ShowcaseGridLayoutBase.cs" />
+    <Compile Include="Core\ShowcaseColorPicker.cs" />
     <Compile Include="Data\Bounds.cs" />
     <Compile Include="Core\Showcase.cs" />
     <Compile Include="Commands\ListFurnitureCommand.cs" />
+    <Compile Include="Data\RotationEffect.cs" />
+    <Compile Include="Data\SpriteInfo.cs" />
     <Compile Include="ModConfig\GlowConfig.cs" />
     <Compile Include="Data\GlowEffect.cs" />
     <Compile Include="ModConfig\ShowcaseConfig.cs" />

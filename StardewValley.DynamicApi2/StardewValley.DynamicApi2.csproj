@@ -78,7 +78,9 @@
     <Compile Include="Constants\CategoryID.cs" />
     <Compile Include="Constants\FurnitureKind.cs" />
     <Compile Include="Constants\ObjectID.cs" />
+    <Compile Include="Constants\ToolID.cs" />
     <Compile Include="Constants\WeaponID.cs" />
+    <Compile Include="Constants\WeaponKind.cs" />
     <Compile Include="Contracts\IInitializable.cs" />
     <Compile Include="DynamicConfiguration.cs" />
     <Compile Include="Data\FurnitureInfo.cs" />

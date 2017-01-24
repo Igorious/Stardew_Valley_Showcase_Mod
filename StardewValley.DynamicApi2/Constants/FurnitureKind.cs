@@ -1,20 +1,22 @@
-﻿namespace Igorious.StardewValley.DynamicApi2.Constants
+﻿using StardewValley.Objects;
+
+namespace Igorious.StardewValley.DynamicApi2.Constants
 {
     public enum FurnitureKind
     {
-        Chair = 0,
-        Bench = 1,
-        Couch = 2,
-        Armchair = 3,
-        Dresser = 4,
-        LongTable = 5,
-        Painting = 6,
-        Lamp = 7,
-        Decor = 8,
-        Other = 9,
-        Bookcase = 10,
-        Table = 11,
-        Rug = 12,
-        Window = 13,
+        Chair = Furniture.chair,
+        Bench = Furniture.bench,
+        Couch = Furniture.couch,
+        Armchair = Furniture.armchair,
+        Dresser = Furniture.dresser,
+        LongTable = Furniture.longTable,
+        Painting = Furniture.painting,
+        Lamp = Furniture.lamp,
+        Decor = Furniture.decor,
+        Other = Furniture.other,
+        Bookcase = Furniture.bookcase,
+        Table = Furniture.table,
+        Rug = Furniture.rug,
+        Window = Furniture.window,
     }
 }
