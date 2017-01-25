@@ -20,7 +20,7 @@ namespace Igorious.StardewValley.ShowcaseMod
         public override void Entry(IModHelper helper)
         {
             Config.Load(Helper.DirectoryPath);
-            Config.Showcases.ForEach(s => ClassMapper.Instance.MapFurniture<Showcase>(s.ID));
+            Config.Showcases.ForEach(s => ClassMapper.Instance.Map.Furniture<Showcase>(s.ID));
             Config.Showcases.ForEach(s => DataService.Instance.RegisterFurniture(ConfigDataConverter.ToFurnitureData(s)));
             Config.Showcases.ForEach(s => ShopService.Instance.AddFurniture(Locations.CarpentersShop, new ShopItemInfo(s.ID)));
 

@@ -1,4 +1,3 @@
-using System;
 using Igorious.StardewValley.ShowcaseMod.ModConfig;
 using Microsoft.Xna.Framework;
 using Object = StardewValley.Object;

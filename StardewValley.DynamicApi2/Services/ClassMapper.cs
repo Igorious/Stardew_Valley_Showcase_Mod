@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using Igorious.StardewValley.DynamicApi2.Contracts;
 using Igorious.StardewValley.DynamicApi2.Events;
 using Igorious.StardewValley.DynamicApi2.Extensions;
 using Igorious.StardewValley.DynamicApi2.Utils;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
-using StardewValley.Objects;
 using Object = StardewValley.Object;
 
 namespace Igorious.StardewValley.DynamicApi2.Services
@@ -17,7 +14,6 @@ namespace Igorious.StardewValley.DynamicApi2.Services
         private static readonly Lazy<ClassMapper> Lazy = new Lazy<ClassMapper>(() => new ClassMapper());
         public static ClassMapper Instance => Lazy.Value;
 
-        private IDictionary<int, Type> FurnitureMapping { get; } = new Dictionary<int, Type>();
         private bool IsMappingActivated { get; set; }
         private ShopMenu CurrentShopMenu { get; set; }
 
@@ -36,11 +32,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             ShopService.Instance.MenuItemsAdded += OnMenuItemsAdded;
         }
 
-        public ClassMapper MapFurniture<T>(int id) where T : Furniture
-        {
-            FurnitureMapping.Add(id, typeof(T));
-            return this;
-        }
+        public ClassMap Map => ClassMap.Instance;
 
         private void ActivateMapping()
         {
@@ -153,51 +145,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             Traverser.Instance.TraverseLocation(Game1.currentLocation, Wrap);
         }
 
-        private Object Wrap(Object basicObject)
-        {
-            if (basicObject == null) return null;
-
-            var customType = TryGetType(basicObject);
-            if (customType == null || basicObject.GetType() == customType) return basicObject;
-
-            var customObject = new Constructor<int, Object>(customType).Invoke(basicObject.ParentSheetIndex);
-            Cloner.Instance.CopyData(basicObject, customObject);
-            (customObject as IInitializable)?.Initialize();
-            return customObject;
-        }
-
-        private Object Unwrap(Object customObject)
-        {
-            if (customObject == null) return null;
-
-            var customType = TryGetType(customObject);
-            if (customObject.GetType() != customType) return customObject;
-
-            Object basicObject;
-            switch (customObject)
-            {
-                case Furniture furniture:
-                    basicObject = new Constructor<Furniture>().Invoke();
-                    break;
-                default:
-                    basicObject = new Constructor<Object>().Invoke();
-                    break;
-            }
-
-            Cloner.Instance.CopyData(customObject, basicObject);
-            basicObject.heldObject = Unwrap(basicObject.heldObject);
-            return basicObject;
-        }
-
-        private Type TryGetType(Object o)
-        {
-            switch (o)
-            {
-                case Furniture furniture:
-                    return FurnitureMapping.TryGetValue(o.ParentSheetIndex, out Type type) ? type : null;
-                default:
-                    return null;
-            }
-        }
+        private static Object Wrap(Object basicObject) => Wrapper.Instance.Wrap(basicObject);
+        private static Object Unwrap(Object customObject) => Wrapper.Instance.Unwrap(customObject);
     }
 }

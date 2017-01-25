@@ -42,7 +42,7 @@ namespace Igorious.StardewValley.DynamicApi2.Utils
         }
     }
 
-    public sealed class Constructor<TClass> : ConstructorBase
+    public sealed class Constructor<TClass> : ConstructorBase, IConstructor<TClass>
     {
         public Constructor() : this(typeof(TClass)) { }
         public Constructor(Type type) : base(type) { }
@@ -51,7 +51,7 @@ namespace Igorious.StardewValley.DynamicApi2.Utils
         protected override Type GetDelegateType() => typeof(Func<TClass>);
     }
 
-    public sealed class Constructor<TArg, TClass> : ConstructorBase
+    public sealed class Constructor<TArg, TClass> : ConstructorBase, IConstructor<TArg, TClass>
     {
         public Constructor() : this(typeof(TClass)) { }
         public Constructor(Type type) : base(type, typeof(TArg)) { }
@@ -60,7 +60,7 @@ namespace Igorious.StardewValley.DynamicApi2.Utils
         protected override Type GetDelegateType() => typeof(Func<TArg, TClass>);
     }
 
-    public sealed class Constructor<TArg1, TArg2, TClass> : ConstructorBase
+    public sealed class Constructor<TArg1, TArg2, TClass> : ConstructorBase, IConstructor<TArg1, TArg2, TClass>
     {
         public Constructor() : this(typeof(TClass)) { }
         public Constructor(Type type) : base(type, typeof(TArg1), typeof(TArg2)) { }
