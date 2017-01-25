@@ -20,10 +20,13 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
         [JsonProperty(Required = Required.Always)]
         public SpriteInfo Sprite { get; set; }
 
+        public SpriteInfo SecondSprite { get; set; }
+
         public SpriteInfo Tint { get; set; }
 
-        [DefaultValue(false)]
-        public bool IsTwoLayer { get; set; }
+        public SpriteInfo SecondTint { get; set; }
+
+        public bool AutoTint { get; set; }
 
         public Size Size { get; set; } = Size.Default;
         public bool ShouldSerializeSize() => Size != Size.Default;
@@ -50,12 +53,6 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
 
         [DefaultValue(1)]
         public float Scale { get; set; } = 1;
-
-        [DefaultValue(1)]
-        public float Alpha { get; set; } = 1;
-
-        [DefaultValue(false)]
-        public bool InverseLayouts { get; set; }
 
         public string Filter { get; set; }
 

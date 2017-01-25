@@ -43,6 +43,8 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         public bool IsEmpty() => Items.All(i => i == null);
 
+        public Item GetNotEmpty() => Items.First(i => i != null);
+
         public bool HasItem(Item item) => Items.Contains(item);
 
         public void AddItem(Item i)

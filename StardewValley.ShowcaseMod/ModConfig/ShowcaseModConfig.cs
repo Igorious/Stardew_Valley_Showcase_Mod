@@ -24,6 +24,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     ID = 1228,
                     Name = "Showcase",
                     Sprite = new SpriteInfo(0),
+                    Tint = new SpriteInfo(2),
                     SpriteBounds = new Bounds
                     {
                         Top = -2,
@@ -44,13 +45,17 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                 {
                     ID = 1230,
                     Name = "Wood Stand",
-                    Sprite = new SpriteInfo(2),
+                    Sprite = new SpriteInfo(4),
+                    Tint = new SpriteInfo(5),
+                    AutoTint = true,
                     Size = new Size(2, 1),
                     BoundingBox = new Size(2, 1),
                     SpriteBounds = new Bounds
                     {
                         Top = 2,
                         Bottom = 14,
+                        Left = 1,
+                        Right = 1,
                     },
                     Price = 1000,
                     Kind = FurnitureKind.Painting,
@@ -59,10 +64,11 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                 },
                 new ShowcaseConfig
                 {
-                    IsTwoLayer = true,
                     ID = 1826,
                     Name = "Chinese Showcase",
-                    Sprite = new SpriteInfo(3),
+                    Sprite = new SpriteInfo(64),
+                    SecondSprite = new SpriteInfo(67),
+
                     Size = new Size(3, 3),
                     BoundingBox = new Size(1, 3),
                     SpriteBounds = new Bounds
@@ -76,27 +82,32 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Columns = 3,
                     Kind = FurnitureKind.Other,
                     Scale = 0.80f,
-                    Alpha = 0.60f,
                     Filter = $"{ItemFilter.ShippableCategory} !{nameof(CategoryID.Cooking)}",
                 },
                 new ShowcaseConfig
                 {
                     ID = 1231,
                     Name = "Old Shield",
-                    Sprite = new SpriteInfo(9),
+                    Sprite = new SpriteInfo(6),
+                    SecondSprite = new SpriteInfo(7),
+                    SecondTint = new SpriteInfo(8),
+                    AutoTint = true,
                     Size = new Size(2, 1),
                     BoundingBox = new Size(2, 1),
-                    SpriteBounds = new Bounds { Top = 2 },
+                    SpriteBounds = new Bounds
+                    {
+                        Top = 2,
+                        Bottom = 10,
+                    },
                     Price = 1000,
                     Kind = FurnitureKind.Painting,
-                    InverseLayouts = true,
                     Filter = $"{nameof(CategoryID.Weapon)} {nameof(CategoryID.Tool)}",
                 },
                 new ShowcaseConfig
                 {
                     ID = 1832,
                     Name = "Darkwood Dresser",
-                    Sprite = new SpriteInfo(10),
+                    Sprite = new SpriteInfo(70),
                     SpriteBounds = new Bounds
                     {
                         Top = -3,
@@ -122,8 +133,9 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                 {
                     ID = -1,
                     Name = "Oak Small Table",
+                    Description = "A cute table with different colors.",
                     Sprite = new SpriteInfo(1391, TextureKind.Global),
-                    Tint = new SpriteInfo(15),
+                    Tint = new SpriteInfo(9),
                     Size = new Size(2, 1),
                     BoundingBox = new Size(1, 1),
                     Scale = 0.875f,
@@ -159,7 +171,6 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     new GlowEffect((int)ObjectID.VoidEssence, Color.Black),
                     new GlowEffect((int)ObjectID.VoidEgg, Color.Black),
                     new GlowEffect((int)ObjectID.VoidMayonnaise, Color.Black),
-                    new GlowEffect((int)ObjectID.VoidSalmon, Color.Black),
 
                     new GlowEffect((int)ObjectID.SolarEssence, Color.Yellow),
 
@@ -169,6 +180,16 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     new GlowEffect((int)ObjectID.Diamond, Color.SkyBlue),
                     new GlowEffect((int)ObjectID.Ruby, Color.Red),
                     new GlowEffect((int)ObjectID.PrismaticShard, Color.White),
+
+                    new GlowEffect((int)ObjectID.Crimsonfish, iridiumGlow),
+                    new GlowEffect((int)ObjectID.Angler, iridiumGlow),
+                    new GlowEffect((int)ObjectID.Legend, iridiumGlow),
+                    new GlowEffect((int)ObjectID.Glacierfish, iridiumGlow),
+                    new GlowEffect((int)ObjectID.MutantCarp, iridiumGlow),
+
+                    new GlowEffect((int)ObjectID.VoidSalmon, Color.Black),
+                    new GlowEffect((int)ObjectID.LavaEel, Color.Red),
+                    new GlowEffect((int)ObjectID.IcePip, Color.SkyBlue),
                 },
             };
 
@@ -209,6 +230,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                 new RotationEffect(CategoryID.Weapon, (int)WeaponID.MasterSlingshot, 0),
                 new RotationEffect(CategoryID.Weapon, (int)WeaponID.GalaxySlingshot, 0),
                 new RotationEffect(CategoryID.Weapon, (int)WeaponID.Scythe, -1),
+                new RotationEffect(CategoryID.Weapon, WeaponKind.Club.ToString(), -1),
             };
         }
     }

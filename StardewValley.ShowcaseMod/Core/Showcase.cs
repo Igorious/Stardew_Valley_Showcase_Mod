@@ -49,7 +49,8 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             ItemProvider.Recalculate();
             var rows = ItemProvider.Rows;
             var cellsCount = (ItemProvider.Capacity + rows - 1) / rows * rows;
-            Game1.activeClickableMenu = new ShowcaseContainer(this, ItemProvider.GetInternalList(), cellsCount, rows, Filter.IsPass, Config.Tint != null);
+            var allowColoring = (Config.Tint != null || Config.SecondTint != null) && !Config.AutoTint;
+            Game1.activeClickableMenu = new ShowcaseContainer(this, ItemProvider.GetInternalList(), cellsCount, rows, Filter.IsPass, allowColoring);
             return true;
         }
 
@@ -71,24 +72,17 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             return (spriteInfo.Kind == TextureKind.Local)? LocalFurnitureTexture : furnitureTexture;
         }
 
-        private Rectangle GetSourceRect(SpriteInfo spriteInfo, int tileWidth, int tileHeigth)
+        private Rectangle GetDefaultSourceRect(SpriteInfo spriteInfo, int width, int heigth)
         {
-            return TextureInfo.Furnitures.GetSourceRect(GetTexture(spriteInfo), spriteInfo.Index, tileWidth, tileHeigth);
+            return TextureInfo.Furnitures.GetSourceRect(GetTexture(spriteInfo), spriteInfo.Index, width / spriteSheetTileSize, heigth / spriteSheetTileSize);
         }
 
         public void Initialize()
         {
+            name = Config.Name;
             description = Config.Description ?? description;
-
-            defaultSourceRect = sourceRect = GetSourceRect(
-                Config.Sprite, 
-                defaultSourceRect.Width / spriteSheetTileSize,
-                defaultSourceRect.Height / spriteSheetTileSize);
-
-            for (var i = 0; i < currentRotation; ++i)
-            {
-                rotate();
-            }
+            defaultSourceRect = sourceRect = GetDefaultSourceRect(Config.Sprite, defaultSourceRect.Width, defaultSourceRect.Height);
+            for (var i = 0; i < currentRotation; ++i) rotate();
 
             var heldChest = heldObject as Chest;
             if (heldChest == null)

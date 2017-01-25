@@ -52,19 +52,33 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             UpdateLightSources();
         }
 
+        private Color GetAutoTintColor()
+        {
+            if (ItemProvider.IsEmpty()) return Color.Black;
+            var color = GetItemGlowColor(ItemProvider.GetNotEmpty());
+            return color == Color.Black? new Color(1, 1, 1) : color ?? Color.Black;
+        }
+
         public void Draw(SpriteBatch spriteBatch, float alpha, Vector2 viewPosition, float scaleSize, float layerDepth, ShowcaseDrawMode drawMode)
         {
-            if (Config.InverseLayouts)
+            DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, Config.Sprite, Color.White, drawMode, ref layerDepth);
+
+            var tintColor = Config.AutoTint? GetAutoTintColor() : Color;
+            if (Config.Tint != null && tintColor != Color.Black)
             {
-                if (Config.IsTwoLayer) DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, false, drawMode, ref layerDepth);
-                if (drawMode != ShowcaseDrawMode.WithoutItems) DrawItems(spriteBatch, alpha * Config.Alpha, viewPosition, scaleSize, drawMode, ref layerDepth);
-                DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, Config.IsTwoLayer, drawMode, ref layerDepth);
+                DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, Config.Tint, tintColor, drawMode, ref layerDepth);
             }
-            else
+            if (drawMode != ShowcaseDrawMode.WithoutItems)
             {
-                DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, Config.IsTwoLayer, drawMode, ref layerDepth);
-                if (drawMode != ShowcaseDrawMode.WithoutItems) DrawItems(spriteBatch, alpha * Config.Alpha, viewPosition, scaleSize, drawMode, ref layerDepth);
-                if (Config.IsTwoLayer) DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, false, drawMode, ref layerDepth);
+                DrawItems(spriteBatch, alpha, viewPosition, scaleSize, drawMode, ref layerDepth);
+            }
+            if (Config.SecondSprite != null)
+            {
+                DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, Config.SecondSprite, Color.White, drawMode, ref layerDepth);
+            }
+            if (Config.SecondTint != null && tintColor != Color.Black)
+            {
+                DrawFurniture(spriteBatch, viewPosition, alpha, scaleSize, Config.SecondTint, tintColor, drawMode, ref layerDepth);
             }
         }
 
@@ -88,34 +102,27 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             return Game1.GlobalToLocal(Game1.viewport, globalPosition);
         }
 
-        private void DrawFurniture(SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, bool useOverlay, ShowcaseDrawMode drawMode, ref float layerDepth)
+        private void DrawFurniture(SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, SpriteInfo sprite, Color color, ShowcaseDrawMode drawMode, ref float layerDepth)
         {
-            var baseSourceRect = useOverlay
-                ? new Rectangle(sourceRect.X + sourceRect.Width, sourceRect.Y, sourceRect.Width, sourceRect.Height)
-                : (drawMode != ShowcaseDrawMode.Icon)? sourceRect : defaultSourceRect;
+            var currentSourceRect = GetDefaultSourceRect(sprite, defaultSourceRect.Width, defaultSourceRect.Height);
+            if (drawMode != ShowcaseDrawMode.Icon)
+            {
+                currentSourceRect.X += (sourceRect.X - defaultSourceRect.X);
+                currentSourceRect.Y += (sourceRect.Y - defaultSourceRect.Y);
+                currentSourceRect.Height = sourceRect.Height;
+                currentSourceRect.Width = sourceRect.Width;
+            }
 
-            void DrawFurnitureSprite(SpriteInfo spriteInfo, Rectangle rect, Color color, float depth) => spriteBatch.Draw(
-                GetTexture(spriteInfo),
+            spriteBatch.Draw(
+                GetTexture(sprite),
                 viewPosition,
-                rect,
+                currentSourceRect,
                 color * alpha,
                 0,
                 Vector2.Zero,
                 scaleSize,
-                (flipped && drawMode != ShowcaseDrawMode.Icon)? SpriteEffects.FlipHorizontally : SpriteEffects.None,
-                depth);
-
-            DrawFurnitureSprite(Config.Sprite, baseSourceRect, Color.White, layerDepth);
-            ChangeDepth(ref layerDepth);
-
-            var tintColor = ((Chest)heldObject).playerChoiceColor;
-            if (tintColor == Color.Black || Config.Tint == null) return;
-
-            var tintSourceRect = GetSourceRect(
-                Config.Tint,
-                baseSourceRect.Width / spriteSheetTileSize,
-                baseSourceRect.Height / spriteSheetTileSize);
-            DrawFurnitureSprite(Config.Tint, tintSourceRect, tintColor, layerDepth);
+                (flipped && drawMode != ShowcaseDrawMode.Icon) ? SpriteEffects.FlipHorizontally : SpriteEffects.None,
+                layerDepth);
             ChangeDepth(ref layerDepth);
         }
 
@@ -147,15 +154,14 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
                     var itemViewPosition = viewPosition + relativeItemPosition.Value;
                     if (drawMode != ShowcaseDrawMode.Icon) UpdateItemGlow(item, spriteBatch, itemViewPosition, alpha, scaleSize, layerDepth);
-                    DrawItem((dynamic)item, spriteBatch, itemViewPosition, alpha, scaleSize, layerDepth);
-                    ChangeDepth(ref layerDepth);
+                    DrawItem((dynamic)item, spriteBatch, itemViewPosition, alpha, scaleSize, ref layerDepth);
                 }
             }
         }
 
         private float GetRotationScale(float rotation) => (rotation != 0)? 1.15f : 1;
 
-        private void DrawItem(Object item, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, float layerDepth)
+        private void DrawItem(Object item, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, ref float layerDepth)
         {
             var rotation = GetItemRotation(item) * MathHelper.PiOver4;
             var tileScaledSize = Game1.tileSize / 2f * (scaleSize * Config.Scale / Game1.pixelZoom);
@@ -172,8 +178,10 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                 depth);
 
             DrawObjectSprite(item.ParentSheetIndex, Color.White, layerDepth);
+            ChangeDepth(ref layerDepth);
             if (!(item is ColoredObject coloredObject)) return;
-            DrawObjectSprite(item.ParentSheetIndex + 1, coloredObject.color, layerDepth + 0.0000001f);
+            DrawObjectSprite(item.ParentSheetIndex + 1, coloredObject.color, layerDepth);
+            ChangeDepth(ref layerDepth);
         }
 
         private void UpdateItemGlow(Item item, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, float layerDepth)
@@ -183,20 +191,22 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             if (color == null) return;
 
             var isDarkItem = (color == Color.Black);
-            var colorAlpha = isDarkItem ? 0.8f : 0.6f;
+            if (GlowConfig.ShowGlows)
+            {
+                var colorAlpha = isDarkItem ? 0.8f : 0.6f;
+                spriteBatch.Draw(
+                    GlowTexture,
+                    viewPosition + TileSize / 2 * (scaleSize * Config.Scale / Game1.pixelZoom),
+                    GlowTexture.Bounds,
+                    color.Value * colorAlpha * alpha,
+                    0,
+                    GlowTexture.Bounds.Center.ToVector(),
+                    4f * (scaleSize * Config.Scale / Game1.pixelZoom),
+                    SpriteEffects.None,
+                    layerDepth - 0.00000009f);
+            }
 
-            spriteBatch.Draw(
-                GlowTexture,
-                viewPosition + TileSize / 2 * (scaleSize * Config.Scale / Game1.pixelZoom),
-                GlowTexture.Bounds,
-                color.Value * colorAlpha * alpha,
-                0,
-                GlowTexture.Bounds.Center.ToVector(),
-                4f * (scaleSize * Config.Scale / Game1.pixelZoom),
-                SpriteEffects.None,
-                layerDepth - 0.00000009f);
-
-            if (isDarkItem) return;
+            if (isDarkItem || !GlowConfig.ShowLights) return;
 
             if (!LightSources.TryGetValue(item, out var light))
             {
@@ -218,7 +228,10 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             if (item is MeleeWeapon || item is Slingshot)
             {
                 var id = ((Tool)item).indexOfMenuItemView;
+                var kind = (WeaponKind?)(item as MeleeWeapon)?.type;
+                var sub = (kind != null && Enum.IsDefined(typeof(WeaponKind), kind))? kind.ToString() : null;
                 var rotation = RotationEffects.FirstOrDefault(r => r.Category == CategoryID.Weapon && r.ID == id)
+                    ?? RotationEffects.FirstOrDefault(r => r.Category == CategoryID.Weapon && r.SubCategory != null && r.SubCategory == sub)
                     ?? RotationEffects.FirstOrDefault(r => r.Category == CategoryID.Weapon);
                 return rotation?.N ?? 0;
             }
@@ -286,7 +299,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             var isPlaced = (Game1.currentLocation as DecoratableLocation)?.furniture.Contains(this) ?? false;
             foreach (var kv in LightSources.ToList())
             {
-                if (ItemProvider.HasItem(kv.Key) && isPlaced)
+                if (ItemProvider.HasItem(kv.Key) && isPlaced && GlowConfig.ShowLights)
                 {
                     Game1.currentLightSources.Add(kv.Value);
                 }
@@ -298,7 +311,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             }
         }
 
-        private void DrawItem(Tool tool, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, float layerDepth)
+        private void DrawItem(Tool tool, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, ref float layerDepth)
         {
             bool IsWeapon() => (tool is MeleeWeapon) || (tool is Slingshot);
 
@@ -316,6 +329,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                 scaleSize * Config.Scale / GetRotationScale(rotation),
                 SpriteEffects.None,
                 layerDepth);
+            ChangeDepth(ref layerDepth);
         }
     }
 }
