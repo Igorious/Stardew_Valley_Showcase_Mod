@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Igorious.StardewValley.DynamicApi2.Compatibility;
 using Igorious.StardewValley.DynamicApi2.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Objects;
 
@@ -21,7 +21,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
 
         private TextureService()
         {
-            GameEvents.LoadContent += OnLoadContent;
+            EntoaroxFrameworkСompatibilityLayout.Instance.ContentIsReadyToOverride += OnLoadContent;
         }
 
         public TextureModule RegisterModule(string path)
@@ -31,10 +31,10 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             return module;
         }
 
-        private void OnLoadContent(object sender, EventArgs eventArgs)
+        private void OnLoadContent()
         {
+            EntoaroxFrameworkСompatibilityLayout.Instance.ContentIsReadyToOverride -= OnLoadContent;
             OverrideSprites();
-            GameEvents.LoadContent -= OnLoadContent;
         }
 
         private void OverrideSprites()

@@ -74,6 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compatibility\EntoaroxFrameworkСompatibilityLayout.cs" />
     <Compile Include="ConsoleCommand.cs" />
     <Compile Include="Constants\CategoryID.cs" />
     <Compile Include="Constants\FurnitureKind.cs" />

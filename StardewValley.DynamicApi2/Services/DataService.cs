@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Igorious.StardewValley.DynamicApi2.Compatibility;
 using Igorious.StardewValley.DynamicApi2.Data;
-using StardewModdingAPI.Events;
 using StardewValley;
 
 namespace Igorious.StardewValley.DynamicApi2.Services
@@ -15,7 +15,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
 
         private DataService()
         {
-            GameEvents.LoadContent += OnLoadContent;
+            EntoaroxFramework—ompatibilityLayout.Instance.ContentIsReadyToOverride += OnLoadContent;
         }
 
         public DataService RegisterFurniture(FurnitureInfo furnitureInfo)
@@ -26,8 +26,10 @@ namespace Igorious.StardewValley.DynamicApi2.Services
 
         public IReadOnlyDictionary<int, string> GetFurniture() => GetFurnitureInternal();
 
-        private void OnLoadContent(object sender, EventArgs eventArgs)
+        private void OnLoadContent()
         {
+            EntoaroxFramework—ompatibilityLayout.Instance.ContentIsReadyToOverride -= OnLoadContent;
+
             var furnitureData = GetFurnitureInternal();
             foreach (var furnitureInfo in FurnitureData)
             {
