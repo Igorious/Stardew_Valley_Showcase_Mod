@@ -88,11 +88,11 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             if (heldChest == null)
             {
                 heldChest = new Chest(true);
-                heldChest.items.AddRange(Enumerable.Repeat<Item>(null, Config.Rows * Config.Columns));
+                heldChest.items.AddRange(Enumerable.Repeat<Item>(null, Config.Layout.Rows * Config.Layout.Columns));
                 heldChest.items[0] = heldObject;
                 heldObject = heldChest;
             }
-            ItemProvider = new ItemGridProvider(heldChest.items, Config.Rows, Config.Columns, currentRotation);
+            ItemProvider = new ItemGridProvider(heldChest.items, Config.Layout.Rows, Config.Layout.Columns, currentRotation);
         }
     }
 }

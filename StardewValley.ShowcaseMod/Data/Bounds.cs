@@ -1,7 +1,11 @@
+using System.Diagnostics;
+
 namespace Igorious.StardewValley.ShowcaseMod.Data
 {
+    [DebuggerDisplay("top:{Top}, left:{Left}, rigth:{Right}, bottom:{Bottom}")]
     public sealed class Bounds
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public static Bounds Empty => new Bounds();
 
         public int Top { get; set; }

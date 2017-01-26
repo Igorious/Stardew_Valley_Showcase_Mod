@@ -34,8 +34,8 @@ namespace Igorious.BuildManifest
             {
                 MajorVersion = version.Major,
                 MinorVersion = version.Minor,
-                PatchVersion = version.Revision,
-                Build = version.Build.ToString(CultureInfo.InvariantCulture),
+                PatchVersion = version.Build,
+                Build = version.Revision.ToString(CultureInfo.InvariantCulture),
             };
         }
     }

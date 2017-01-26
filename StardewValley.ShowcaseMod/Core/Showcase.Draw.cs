@@ -138,9 +138,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
             var itemProvider = (drawMode != ShowcaseDrawMode.Icon)? ItemProvider : ItemProvider.Clone(newRotation: 0);
             var actualSourceRect = (drawMode != ShowcaseDrawMode.Icon)? sourceRect : defaultSourceRect;
-            var layout = Config.Layout == ShowcaseLayoutKind.Fixed
-                ? new ShowcaseFixedLayout(scaleSize, actualSourceRect, itemProvider, Config) 
-                : (IShowcaseLayout) new ShowcaseAutoLayout(scaleSize, actualSourceRect, itemProvider, Config);
+            var layout = GetLayout(scaleSize, actualSourceRect, itemProvider);
 
             for (var i = 0; i < itemProvider.Rows; ++i)
             {
@@ -159,12 +157,27 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             }
         }
 
-        private float GetRotationScale(float rotation) => (rotation != 0)? 1.15f : 1;
+        private IShowcaseLayout GetLayout(float scaleSize, Rectangle actualSourceRect, ItemGridProvider itemProvider)
+        {
+            switch (Config.Layout.Type)
+            {
+                case ShowcaseLayoutKind.Fixed:
+                    return new ShowcaseFixedLayout(scaleSize, actualSourceRect, itemProvider, Config.Layout);
+                case ShowcaseLayoutKind.Auto:
+                    return new ShowcaseAutoLayout(scaleSize, actualSourceRect, itemProvider, Config.Layout);
+                case ShowcaseLayoutKind.Manual:
+                    return new ShowcaseManualLayout(scaleSize, Config.Layout);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private float GetRotationScale(float rotation) => (rotation != 0)? 1.14f : 1;
 
         private void DrawItem(Object item, SpriteBatch spriteBatch, Vector2 viewPosition, float alpha, float scaleSize, ref float layerDepth)
         {
             var rotation = GetItemRotation(item) * MathHelper.PiOver4;
-            var tileScaledSize = Game1.tileSize / 2f * (scaleSize * Config.Scale / Game1.pixelZoom);
+            var tileScaledSize = Game1.tileSize / 2f * (scaleSize * Config.Layout.Scale / Game1.pixelZoom);
 
             void DrawObjectSprite(int spriteIndex, Color color, float depth) => spriteBatch.Draw(
                 Game1.objectSpriteSheet,
@@ -173,7 +186,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                 color * alpha,
                 rotation,
                 new Vector2(spriteSheetTileSize, spriteSheetTileSize) / 2f,
-                scaleSize * Config.Scale / GetRotationScale(rotation),
+                scaleSize * Config.Layout.Scale / GetRotationScale(rotation),
                 SpriteEffects.None,
                 depth);
 
@@ -196,12 +209,12 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                 var colorAlpha = isDarkItem ? 0.8f : 0.6f;
                 spriteBatch.Draw(
                     GlowTexture,
-                    viewPosition + TileSize / 2 * (scaleSize * Config.Scale / Game1.pixelZoom),
+                    viewPosition + TileSize / 2 * (scaleSize * Config.Layout.Scale / Game1.pixelZoom),
                     GlowTexture.Bounds,
                     color.Value * colorAlpha * alpha,
                     0,
                     GlowTexture.Bounds.Center.ToVector(),
-                    4f * (scaleSize * Config.Scale / Game1.pixelZoom),
+                    4f * (scaleSize * Config.Layout.Scale / Game1.pixelZoom),
                     SpriteEffects.None,
                     layerDepth - 0.00000009f);
             }
@@ -317,7 +330,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
             var textureInfo = IsWeapon()? TextureInfo.Weapons : TextureInfo.Tools;
             var rotation = GetItemRotation(tool) * MathHelper.PiOver4;
-            var tileScaledSize = Game1.tileSize / 2f * (scaleSize * Config.Scale / Game1.pixelZoom);
+            var tileScaledSize = Game1.tileSize / 2f * (scaleSize * Config.Layout.Scale / Game1.pixelZoom);
 
             spriteBatch.Draw(
                 textureInfo.Texture,
@@ -326,7 +339,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                 Color.White * alpha,
                 rotation,
                 new Vector2(spriteSheetTileSize, spriteSheetTileSize) / 2f,
-                scaleSize * Config.Scale / GetRotationScale(rotation),
+                scaleSize * Config.Layout.Scale / GetRotationScale(rotation),
                 SpriteEffects.None,
                 layerDepth);
             ChangeDepth(ref layerDepth);

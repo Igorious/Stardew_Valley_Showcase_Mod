@@ -75,6 +75,7 @@
     <Compile Include="Constants\TextureKind.cs" />
     <Compile Include="Core\Layouts\IShowcaseLayout.cs" />
     <Compile Include="Core\ItemFilter.cs" />
+    <Compile Include="Core\Layouts\ShowcaseManualLayout.cs" />
     <Compile Include="Core\Showcase.Draw.cs" />
     <Compile Include="Core\ItemGridProvider.cs" />
     <Compile Include="Core\Layouts\ShowcaseAutoLayout.cs" />
@@ -88,6 +89,8 @@
     <Compile Include="Data\SpriteInfo.cs" />
     <Compile Include="ModConfig\GlowConfig.cs" />
     <Compile Include="Data\GlowEffect.cs" />
+    <Compile Include="Data\ItemPosition.cs" />
+    <Compile Include="ModConfig\LayoutConfig.cs" />
     <Compile Include="ModConfig\ShowcaseConfig.cs" />
     <Compile Include="Core\ShowcaseContainer.cs" />
     <Compile Include="Constants\ShowcaseLayoutKind.cs" />

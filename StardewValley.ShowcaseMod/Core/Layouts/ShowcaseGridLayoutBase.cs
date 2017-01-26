@@ -18,9 +18,9 @@ namespace Igorious.StardewValley.ShowcaseMod.Core.Layouts
         protected float ScaleSize { get; }
         protected Rectangle SourceRect { get; }
         protected ItemGridProvider ItemProvider { get; }
-        protected ShowcaseConfig Config { get; }
+        protected LayoutConfig Config { get; }
 
-        protected ShowcaseGridLayoutBase(float scaleSize, Rectangle sourceRect, ItemGridProvider itemProvider, ShowcaseConfig config)
+        protected ShowcaseGridLayoutBase(float scaleSize, Rectangle sourceRect, ItemGridProvider itemProvider, LayoutConfig config)
         {
             ScaleSize = scaleSize;
             SourceRect = sourceRect;

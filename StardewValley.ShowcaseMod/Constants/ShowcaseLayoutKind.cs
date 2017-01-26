@@ -4,5 +4,6 @@ namespace Igorious.StardewValley.ShowcaseMod.Constants
     {
         Fixed,
         Auto,
+        Manual,
     }
 }

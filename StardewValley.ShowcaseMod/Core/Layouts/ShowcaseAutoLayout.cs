@@ -6,7 +6,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core.Layouts
 {
     internal class ShowcaseAutoLayout : ShowcaseGridLayoutBase
     {
-        public ShowcaseAutoLayout(float scaleSize, Rectangle sourceRect, ItemGridProvider itemProvider, ShowcaseConfig config) 
+        public ShowcaseAutoLayout(float scaleSize, Rectangle sourceRect, ItemGridProvider itemProvider, LayoutConfig config) 
             : base(scaleSize, sourceRect, itemProvider, config) { }
 
         protected override int GetTopRow()

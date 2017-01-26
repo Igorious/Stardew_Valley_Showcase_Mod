@@ -1,11 +1,14 @@
+using System.Diagnostics;
+
 namespace Igorious.StardewValley.DynamicApi2.Data
 {
+    [DebuggerDisplay("{Width}x{Height}")]
     public sealed class Size
     {
         public static Size Default => new Size(-1, -1);
 
         public Size() { }
-        public Size(int height, int width)
+        public Size(int width, int height = 1)
         {
             Width = width;
             Height = height;

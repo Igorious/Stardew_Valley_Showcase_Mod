@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using Igorious.StardewValley.ShowcaseMod.Constants;
 using Newtonsoft.Json;
 
 namespace Igorious.StardewValley.ShowcaseMod.Data
 {
+    [DebuggerDisplay("[{Kind}] {Index}")]
     public sealed class SpriteInfo
     {
         public SpriteInfo() { }

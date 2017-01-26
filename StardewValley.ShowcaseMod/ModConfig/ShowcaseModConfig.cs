@@ -25,21 +25,23 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Name = "Showcase",
                     Sprite = new SpriteInfo(0),
                     Tint = new SpriteInfo(2),
-                    SpriteBounds = new Bounds
+                    Layout = new LayoutConfig(ShowcaseLayoutKind.Auto)
                     {
-                        Top = -2,
-                        Bottom = 5,
-                        Left = 1,
-                        Right = 1,
+                        SpriteBounds = new Bounds
+                        {
+                            Top = -2,
+                            Bottom = 5,
+                            Left = 1,
+                            Right = 1,
+                        },
+                        Columns = 3,
+                        Rows = 3,
                     },
                     Size = new Size(2, 2),
                     BoundingBox = new Size(2, 2),
                     Price = 1000,
-                    Columns = 3,
-                    Rows = 3,
                     Kind = FurnitureKind.Table,
                     Filter = $"{ItemFilter.ShippableCategory}",
-                    Layout = ShowcaseLayoutKind.Auto,
                 },
                 new ShowcaseConfig
                 {
@@ -48,18 +50,21 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Sprite = new SpriteInfo(4),
                     Tint = new SpriteInfo(5),
                     AutoTint = true,
-                    Size = new Size(2, 1),
-                    BoundingBox = new Size(2, 1),
-                    SpriteBounds = new Bounds
+                    Size = new Size(1, 2),
+                    BoundingBox = new Size(1, 2),
+                    Layout = new LayoutConfig
                     {
-                        Top = 2,
-                        Bottom = 14,
-                        Left = 1,
-                        Right = 1,
+                        SpriteBounds = new Bounds
+                        {
+                            Top = 2,
+                            Bottom = 14,
+                            Left = 1,
+                            Right = 1,
+                        },
+                        Scale = 0.85f,
                     },
                     Price = 1000,
                     Kind = FurnitureKind.Painting,
-                    Scale = 0.85f,
                     Filter = $"{nameof(CategoryID.Fish)}",
                 },
                 new ShowcaseConfig
@@ -68,20 +73,22 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Name = "Chinese Showcase",
                     Sprite = new SpriteInfo(64),
                     SecondSprite = new SpriteInfo(67),
-
                     Size = new Size(3, 3),
-                    BoundingBox = new Size(1, 3),
-                    SpriteBounds = new Bounds
+                    BoundingBox = new Size(3),
+                    Layout = new LayoutConfig
                     {
-                        Top = 13,
-                        Bottom = 23,
-                        Right = 5,
-                        Left = 5,
+                        SpriteBounds = new Bounds
+                        {
+                            Top = 13,
+                            Bottom = 23,
+                            Right = 5,
+                            Left = 5,
+                        },
+                        Columns = 3,
+                        Scale = 0.80f,
                     },
                     Price = 1000,
-                    Columns = 3,
                     Kind = FurnitureKind.Other,
-                    Scale = 0.80f,
                     Filter = $"{ItemFilter.ShippableCategory} !{nameof(CategoryID.Cooking)}",
                 },
                 new ShowcaseConfig
@@ -92,12 +99,15 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     SecondSprite = new SpriteInfo(7),
                     SecondTint = new SpriteInfo(8),
                     AutoTint = true,
-                    Size = new Size(2, 1),
-                    BoundingBox = new Size(2, 1),
-                    SpriteBounds = new Bounds
+                    Size = new Size(1, 2),
+                    BoundingBox = new Size(1, 2),
+                    Layout = new LayoutConfig
                     {
-                        Top = 2,
-                        Bottom = 10,
+                        SpriteBounds = new Bounds
+                        {
+                            Top = 2,
+                            Bottom = 10,
+                        },
                     },
                     Price = 1000,
                     Kind = FurnitureKind.Painting,
@@ -108,24 +118,27 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     ID = 1832,
                     Name = "Darkwood Dresser",
                     Sprite = new SpriteInfo(70),
-                    SpriteBounds = new Bounds
+                    Layout = new LayoutConfig
                     {
-                        Top = -3,
-                        Left = 2,
-                        Right = 2,
-                        Bottom = 21,
-                    },
-                    AltSpriteBounds = new Bounds
-                    {
-                        Top = -3,
-                        Left = 2,
-                        Right = 5,
-                        Bottom = 24,
+                        SpriteBounds = new Bounds
+                        {
+                            Top = -3,
+                            Left = 2,
+                            Right = 2,
+                            Bottom = 21,
+                        },
+                        AltSpriteBounds = new Bounds
+                        {
+                            Top = -3,
+                            Left = 2,
+                            Right = 5,
+                            Bottom = 24,
+                        },
+                        Columns = 2,
+                        Scale = 0.85f,
                     },
                     Price = 1000,
-                    Columns = 2,
                     Kind = FurnitureKind.Dresser,
-                    Scale = 0.85f,
                     Filter = $"{ItemFilter.ShippableCategory}",
                     Rotations = 4,
                 },
@@ -136,18 +149,48 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     Description = "A cute table with different colors.",
                     Sprite = new SpriteInfo(1391, TextureKind.Global),
                     Tint = new SpriteInfo(9),
-                    Size = new Size(2, 1),
-                    BoundingBox = new Size(1, 1),
-                    Scale = 0.875f,
-                    SpriteBounds = new Bounds
+                    Size = new Size(1, 2),
+                    BoundingBox = new Size(1),
+                    Layout = new LayoutConfig
                     {
-                        Top = 4,
-                        Bottom = 14,
-                        Left = 1,
-                        Right = 1,
+                        Scale = 0.875f,
+                        SpriteBounds = new Bounds
+                        {
+                            Top = 4,
+                            Bottom = 14,
+                            Left = 1,
+                            Right = 1,
+                        },
                     },
                     Price = 1000,
                     Kind = FurnitureKind.Table,
+                    Filter = $"{ItemFilter.ShippableCategory}",
+                },
+                new ShowcaseConfig
+                {
+                    ID = -2,
+                    Name = "AAA",
+                    Sprite = new SpriteInfo(75),
+                    SecondSprite = new SpriteInfo(77),
+                    Size = new Size(2, 3),
+                    BoundingBox = new Size(2),
+                    Layout = new LayoutConfig(ShowcaseLayoutKind.Manual)
+                    {
+                        Scale = 0.50f,
+                        Positions = new List<ItemPosition>
+                        {
+                            new ItemPosition(7, 17),
+                            new ItemPosition(20, 11),
+                            new ItemPosition(3, 26),
+                            new ItemPosition(19, 22),
+                            new ItemPosition(4, 37),
+                            new ItemPosition(17, 32),
+                        },
+                        Rows = 3,
+                        Columns = 2,
+                    },
+                    Price = 1000,
+                    Kind = FurnitureKind.Bookcase,
                     Filter = $"{ItemFilter.ShippableCategory}",
                 },
             };
