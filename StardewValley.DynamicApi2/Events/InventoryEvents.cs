@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Igorious.StardewValley.DynamicApi2.Extensions;
-using Igorious.StardewValley.DynamicApi2.Utils;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
@@ -14,32 +13,10 @@ namespace Igorious.StardewValley.DynamicApi2.Events
     {
         static InventoryEvents()
         {
-            GameEvents.UpdateTick += ActiveObjectChangedHanler.OnUpdateTick;
             MenuEvents.MenuChanged += CraftedObjectChangedHandler.OnMenuChanged;
         }
 
-        public static event Action<ObjectEventArgs> ActiveObjectChanged;
         public static event Action<ObjectEventArgs> CraftedObjectChanged;
-
-        private static class ActiveObjectChangedHanler
-        {
-            private static Object PreviousActiveObject { get; set; }
-
-            public static void OnUpdateTick(object sender, EventArgs e)
-            {
-                var activeObject = Game1.player.ActiveObject;
-                if (activeObject == PreviousActiveObject) return;
-
-                var args = new ObjectEventArgs(activeObject);
-                ActiveObjectChanged?.Invoke(args);
-                if (activeObject != args.Object)
-                {
-                    Log.Trace($"Active object: {Game1.player.ActiveObject.GetInfo()}");
-                    PreviousActiveObject = Game1.player.ActiveObject = args.Object;
-                    Log.Trace($"Active object: {Game1.player.ActiveObject.GetInfo()}");
-                }
-            }
-        }
 
         private static class CraftedObjectChangedHandler
         {

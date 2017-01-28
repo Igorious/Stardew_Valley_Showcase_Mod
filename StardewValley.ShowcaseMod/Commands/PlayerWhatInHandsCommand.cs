@@ -1,4 +1,5 @@
 using Igorious.StardewValley.DynamicApi2;
+using Igorious.StardewValley.DynamicApi2.Extensions;
 using StardewModdingAPI;
 using StardewValley;
 
@@ -11,7 +12,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Commands
         public void Execute()
         {
             var item = Game1.player.ActiveObject ?? (Item)Game1.player.CurrentTool;
-            Info(item != null ? $"{item.Name} [{item.GetType().Name} ID={item.parentSheetIndex}]" : "Nothing");
+            Info(item.GetInfo());
         }
     }
 }

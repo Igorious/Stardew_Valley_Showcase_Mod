@@ -7,17 +7,19 @@ namespace Igorious.StardewValley.DynamicApi2.Extensions
     {
         public static string GetInfo(this Item item)
         {
+            if (item == null) return "{Empty}";
             return item is Object o
                 ? o.GetInfo() 
-                : $"{item.Name} [{item.GetType().Name}]";
+                : $"{item.Name} [ID={item.parentSheetIndex}, {item.GetType().Name}]";
         }
 
-        public static string GetInfo(this Object o)
+        private static string GetInfo(this Object o)
         {
-            if (o == null) return "{Empty}";
             var buffer = new StringBuilder(o.Name);
             if (o.Stack != 1) buffer.Append(" x").Append(o.Stack);
-            if (o.GetType() != typeof(Object)) buffer.Append(" [").Append(o.GetType().Name).Append("]");
+            buffer.Append(" [ID=").Append(o.parentSheetIndex);
+            if (o.GetType() != typeof(Object)) buffer.Append(", ").Append(o.GetType().Name);
+            buffer.Append("]");
             return buffer.ToString();
         }
     }

@@ -67,10 +67,6 @@ namespace Igorious.StardewValley.DynamicApi2.Services
                 if (!(farmer.Items[i] is Object inventoryObject)) continue;
                 farmer.Items[i] = processObject(inventoryObject);
             }
-            if (farmer.ActiveObject != null)
-            {
-                farmer.ActiveObject = processObject(farmer.ActiveObject);
-            }
         }
 
         private void TraverseChest(Chest chest, Func<Object, Object> processObject)

@@ -25,7 +25,6 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             SaveEvents.AfterSave += (s, e) => ActivateMapping();
             LocationEvents.CurrentLocationChanged += OnCurrentLocationChanged;
             LocationEvents.LocationObjectsChanged += OnLocationObjectsChanged;
-            InventoryEvents.ActiveObjectChanged += OnObjectChanged;
             InventoryEvents.CraftedObjectChanged += OnObjectChanged;
             PlayerEvents.InventoryChanged += OnInventoryChanged;
             MenuEvents.MenuChanged += MenuEventsOnMenuChanged;
