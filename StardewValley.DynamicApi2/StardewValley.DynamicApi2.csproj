@@ -74,6 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compatibility\CjbItemSpawnerCompatibilityLayout.cs" />
     <Compile Include="Compatibility\EntoaroxFrameworkСompatibilityLayout.cs" />
     <Compile Include="ConsoleCommand.cs" />
     <Compile Include="Constants\CategoryID.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Extensions\ModExtensions.cs" />
+    <Compile Include="Extensions\ItemExtensions.cs" />
     <Compile Include="Extensions\PointExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Json\JsonPlainArrayConverter.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Utils\IConstructor.cs" />
     <Compile Include="Utils\Constructor.cs" />
     <Compile Include="Utils\Log.cs" />
+    <Compile Include="Utils\Smapi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

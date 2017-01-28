@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Igorious.StardewValley.DynamicApi2.Utils;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -14,22 +15,22 @@ namespace Igorious.StardewValley.DynamicApi2.Compatibility
         private static readonly Lazy<EntoaroxFrameworkСompatibilityLayout> Lazy = new Lazy<EntoaroxFrameworkСompatibilityLayout>(() => new EntoaroxFrameworkСompatibilityLayout());
         public static EntoaroxFrameworkСompatibilityLayout Instance => Lazy.Value;
 
-        private IModRegistry ModRegistry { get; }
+        private bool UseCompatibility { get; }
 
         public event Action ContentIsReadyToOverride;
 
         private EntoaroxFrameworkСompatibilityLayout()
         {
-            ModRegistry = (IModRegistry)typeof(Program).GetField("ModRegistry", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).GetValue(null);
+            UseCompatibility = Smapi.GetModRegistry().IsLoaded(EntoaroxFrameworkID);
+            if (UseCompatibility) Log.Trace("Found Entoarox Framework. Used compatibility mode.");
             GameEvents.LoadContent += GameEventsOnLoadContent;
         }
 
         private void GameEventsOnLoadContent(object sender, EventArgs eventArgs)
         {
             GameEvents.LoadContent -= GameEventsOnLoadContent;
-            if (ModRegistry.IsLoaded(EntoaroxFrameworkID))
-            {
-                Log.Trace("Found Entoarox Framework. Used compatibility mode.");
+            if (UseCompatibility)
+            {                
                 GameEvents.UpdateTick += GameEventsOnUpdateTick;
             }
             else

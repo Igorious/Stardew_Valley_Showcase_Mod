@@ -31,9 +31,14 @@ namespace Igorious.StardewValley.DynamicApi2.Extensions
             return GetField<T>(o, o.GetType(), fieldName);
         }
 
+        public static T GetField<T>(this Type type, string fieldName) where T : class
+        {
+            return GetFieldInfo(type, fieldName, isStatic: true)?.GetValue(null) as T;
+        }
+
         public static void SetField<T>(this object o, string fieldName, T value) where T : class
         {
-            var fieldInfo = GetFieldInfo(o.GetType(), fieldName);
+            var fieldInfo = GetFieldInfo(o.GetType(), fieldName, isStatic: false);
             fieldInfo?.SetValue(o, value);
         }
 
@@ -54,14 +59,14 @@ namespace Igorious.StardewValley.DynamicApi2.Extensions
 
         private static T GetField<T>(object o, Type type, string fieldName) where T : class
         {
-            return GetFieldInfo(type, fieldName)?.GetValue(o) as T;
+            return GetFieldInfo(type, fieldName, isStatic: false)?.GetValue(o) as T;
         }
 
-        private static FieldInfo GetFieldInfo(Type type, string fieldName)
+        private static FieldInfo GetFieldInfo(Type type, string fieldName, bool isStatic)
         {
             while (type != typeof(object))
             {
-                var fieldInfo = type.GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var fieldInfo = type.GetField(fieldName, (isStatic? BindingFlags.Static : BindingFlags.Instance) | BindingFlags.Public | BindingFlags.NonPublic);
                 if (fieldInfo != null) return fieldInfo;
                 type = type.BaseType;
             }

@@ -1,18 +1,10 @@
-﻿using System.Reflection;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 
 namespace Igorious.StardewValley.DynamicApi2.Utils
 {
     public sealed class Log
     {
-        private static IMonitor Monitor { get; }
-
-        static Log()
-        {
-            Monitor = (IMonitor)typeof(Program)
-                .GetMethod("GetSecondaryMonitor", BindingFlags.Static | BindingFlags.NonPublic)
-                .Invoke(null, new object[] {"DynamicAPI2"});
-        }
+        private static IMonitor Monitor { get; } = Smapi.GetMonitor("DynamicAPI2");
 
         public static void Debug(string message) => Monitor.Log(message);
 

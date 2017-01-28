@@ -1,4 +1,5 @@
 ﻿using System;
+using Igorious.StardewValley.DynamicApi2.Compatibility;
 using Igorious.StardewValley.DynamicApi2.Events;
 using Igorious.StardewValley.DynamicApi2.Extensions;
 using Igorious.StardewValley.DynamicApi2.Utils;
@@ -30,6 +31,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             MenuEvents.MenuChanged += MenuEventsOnMenuChanged;
             MenuEvents.MenuClosed += MenuEventsOnMenuClosed;
             ShopService.Instance.MenuItemsAdded += OnMenuItemsAdded;
+            CjbItemSpawnerCompatibilityLayout.Instance.Initialize();
         }
 
         public ClassMap Map => ClassMap.Instance;

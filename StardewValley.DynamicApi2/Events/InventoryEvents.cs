@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Igorious.StardewValley.DynamicApi2.Extensions;
+using Igorious.StardewValley.DynamicApi2.Utils;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
@@ -33,7 +34,9 @@ namespace Igorious.StardewValley.DynamicApi2.Events
                 ActiveObjectChanged?.Invoke(args);
                 if (activeObject != args.Object)
                 {
+                    Log.Trace($"Active object: {Game1.player.ActiveObject.GetInfo()}");
                     PreviousActiveObject = Game1.player.ActiveObject = args.Object;
+                    Log.Trace($"Active object: {Game1.player.ActiveObject.GetInfo()}");
                 }
             }
         }
