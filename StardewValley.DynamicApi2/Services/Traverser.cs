@@ -38,10 +38,6 @@ namespace Igorious.StardewValley.DynamicApi2.Services
             {
                 var oldObject = objectInfo.Value;
                 var newObject = processObject(oldObject);
-                if (newObject.heldObject != null)
-                {
-                    newObject.heldObject = processObject(newObject.heldObject);
-                }
                 TraverseChest(newObject as Chest, processObject);
                 if (oldObject != newObject)
                 {

@@ -58,8 +58,14 @@ namespace Igorious.StardewValley.DynamicApi2
         private string GetSignature(ParameterInfo[] parametersInfo)
         {
             return parametersInfo.Any()
-                ? string.Join(", ", parametersInfo.Select(p => p.Name + ":" + p.ParameterType.Name))
+                ? string.Join(", ", parametersInfo.Select(p => p.Name + ":" + GetTypeName(p.ParameterType)))
                 : "No arguments";
+        }
+
+        private string GetTypeName(Type parameterType)
+        {
+            if (!parameterType.IsEnum) return parameterType.Name;
+            return $"({string.Join("|", Enum.GetNames(parameterType))})";
         }
 
         private void OnFired(object sender, EventArgsCommand e)
@@ -81,7 +87,7 @@ namespace Igorious.StardewValley.DynamicApi2
                 var result = TryParseArgument(arg, type);
                 if (result == null)
                 {
-                    Error($"Can't convert arg{i} from \"{arg}\" to {type.Name}.");
+                    Error($"Can't convert arg{i} from \"{arg}\" to {GetTypeName(type)}.");
                     return;
                 }
                 parsedArgs[i] = result;
@@ -91,6 +97,25 @@ namespace Igorious.StardewValley.DynamicApi2
         }   
 
         private object TryParseArgument(string arg, Type type)
+        {
+            return type.IsEnum
+                ? TryParseEnumArgument(arg, type) 
+                : TryParseStandartArgument(arg, type);
+        }
+
+        private object TryParseEnumArgument(string arg, Type type)
+        {
+            try
+            {
+                return Enum.Parse(type, arg);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private object TryParseStandartArgument(string arg, Type type)
         {
             try
             {

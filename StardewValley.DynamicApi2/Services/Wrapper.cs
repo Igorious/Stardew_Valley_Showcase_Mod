@@ -21,6 +21,8 @@ namespace Igorious.StardewValley.DynamicApi2.Services
         {
             if (basicObject == null) return null;
 
+            basicObject.heldObject = Wrap(basicObject.heldObject);
+
             var customType = TryGetType(basicObject);
             if (customType == null || basicObject.GetType() == customType) return basicObject;
 
@@ -34,6 +36,8 @@ namespace Igorious.StardewValley.DynamicApi2.Services
         public Object Unwrap(Object customObject)
         {
             if (customObject == null) return null;
+
+            customObject.heldObject = Unwrap(customObject.heldObject);
 
             var customType = TryGetType(customObject);
             if (customObject.GetType() != customType) return customObject;
@@ -51,7 +55,6 @@ namespace Igorious.StardewValley.DynamicApi2.Services
 
             var basicObject = basicCtor.Invoke();
             Cloner.Instance.CopyData(customObject, basicObject);
-            basicObject.heldObject = Unwrap(basicObject.heldObject);
             return basicObject;
         }
 

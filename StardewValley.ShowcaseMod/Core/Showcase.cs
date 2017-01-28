@@ -8,8 +8,8 @@ using Igorious.StardewValley.ShowcaseMod.ModConfig;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Locations;
 using StardewValley.Objects;
-using Object = StardewValley.Object;
 
 namespace Igorious.StardewValley.ShowcaseMod.Core
 {
@@ -33,6 +33,26 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             RotationEffects = ShowcaseMod.Config.RotationEffects;
         }
 
+        public override bool canBePlacedHere(GameLocation location, Vector2 tile)
+        {
+            var result = base.canBePlacedHere(location, tile);
+            if (!result || getTilesWide() != 1) return result;
+
+            var decoratableLocation = (DecoratableLocation)location;
+            for (var ty = 0; ty < getTilesHigh(); ++ty)
+            {
+                var position = (tile + new Vector2(0.5f, ty + 0.5f)) * Game1.tileSize;
+                foreach (var furniture in decoratableLocation.furniture)
+                {
+                    if (furniture.furniture_type == 11 && furniture.getBoundingBox(furniture.tileLocation).Contains((int)position.X, (int)position.Y) && furniture.heldObject == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         public override bool clicked(Farmer who)
         {
             var chest = heldObject;
@@ -53,6 +73,8 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             Game1.activeClickableMenu = new ShowcaseContainer(this, ItemProvider.GetInternalList(), cellsCount, rows, Filter.IsPass, allowColoring);
             return true;
         }
+
+        public override Item getOne() => (Item)MemberwiseClone();
 
         public override bool performObjectDropInAction(Object dropIn, bool probe, Farmer who)
         {
