@@ -39,9 +39,14 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         public bool IsPass(Item item)
         {
-            if ((item is Object o) && (o.bigCraftable || o is Furniture)) return false;
+            if ((item is Object o) && (o.bigCraftable || o is Furniture furniture && !IsSmallFurniture(furniture))) return false;
             return (!OrFilters.Any() || OrFilters.Any(f => f(item))) 
                 && NotFilters.All(f => !f(item));
+        }
+
+        private static bool IsSmallFurniture(Furniture furniture)
+        {
+            return furniture.getTilesHigh() == 1 && furniture.getTilesWide() == 1;
         }
 
         private static Func<Item, bool> GetFilter(string filterName)
@@ -57,8 +62,13 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                         Log.Error($@"Filter ""{filterName}"" is not recognized!");
                         return null;
                     }
-                    return i => i.category == (int)category;
+                    return i => GetCategory(i) == category;
             }
+        }
+
+        private static CategoryID GetCategory(Item item)
+        {
+            return (item is Furniture)? CategoryID.Furniture : (CategoryID)item.category;
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     BoundingBox = new Size(2, 2),
                     Price = 1000,
                     Kind = FurnitureKind.Table,
-                    Filter = $"{ItemFilter.ShippableCategory}",
+                    Filter = $"{ItemFilter.ShippableCategory} {CategoryID.Furniture}",
                 },
                 new ShowcaseConfig
                 {
@@ -89,7 +89,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     },
                     Price = 1000,
                     Kind = FurnitureKind.Other,
-                    Filter = $"{ItemFilter.ShippableCategory} !{nameof(CategoryID.Cooking)}",
+                    Filter = $"{ItemFilter.ShippableCategory} {CategoryID.Furniture} !{nameof(CategoryID.Cooking)}",
                 },
                 new ShowcaseConfig
                 {
@@ -139,7 +139,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     },
                     Price = 1000,
                     Kind = FurnitureKind.Dresser,
-                    Filter = $"{ItemFilter.ShippableCategory}",
+                    Filter = $"{ItemFilter.ShippableCategory} {CategoryID.Furniture}",
                     Rotations = 4,
                 },
                 new ShowcaseConfig
@@ -164,12 +164,12 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     },
                     Price = 1000,
                     Kind = FurnitureKind.Table,
-                    Filter = $"{ItemFilter.ShippableCategory}",
+                    Filter = $"{ItemFilter.ShippableCategory} {CategoryID.Furniture}",
                 },
                 new ShowcaseConfig
                 {
                     ID = -2,
-                    Name = "AAA",
+                    Name = "Funny Bookcase",
                     Sprite = new SpriteInfo(75),
                     SecondSprite = new SpriteInfo(77),
                     Size = new Size(2, 3),
@@ -191,7 +191,7 @@ namespace Igorious.StardewValley.ShowcaseMod.ModConfig
                     },
                     Price = 1000,
                     Kind = FurnitureKind.Bookcase,
-                    Filter = $"{ItemFilter.ShippableCategory}",
+                    Filter = $"{ItemFilter.ShippableCategory} {CategoryID.Furniture}",
                 },
             };
 

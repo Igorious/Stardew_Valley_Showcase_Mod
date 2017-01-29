@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="ConfigDataConverter.cs" />
     <Compile Include="Constants\TextureKind.cs" />
+    <Compile Include="Core\DepthProvider.cs" />
     <Compile Include="Core\Layouts\IShowcaseLayout.cs" />
     <Compile Include="Core\ItemFilter.cs" />
     <Compile Include="Core\Layouts\ShowcaseManualLayout.cs" />
