@@ -54,8 +54,9 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         private Color GetAutoTintColor()
         {
-            if (ItemProvider.IsEmpty()) return Color.Black;
-            var color = GetItemGlowColor(ItemProvider.GetNotEmpty());
+            var item = ItemProvider.FirstOrDefault(i => i != null);
+            if (item == null) return Color.Black;
+            var color = GetItemGlowColor(item);
             return color == Color.Black? new Color(1, 1, 1) : color ?? Color.Black;
         }
 
@@ -128,7 +129,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
         private void DrawItems(SpriteBatch spriteBatch, float alpha, Vector2 viewPosition, float scaleSize, ShowcaseDrawMode drawMode, DepthProvider depthProvider)
         {
-            if (ItemProvider.IsEmpty()) return;
+            if (ItemProvider.All(i => i == null)) return;
             ItemProvider.UpdateCurrentRotation(currentRotation);
 
             var itemProvider = (drawMode != ShowcaseDrawMode.Icon)? ItemProvider : ItemProvider.Clone(newRotation: 0);
@@ -159,7 +160,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
                 Color.White * 0.4f * alpha,
                 0,
                 Game1.shadowTexture.Bounds.Center.ToVector(),
-                scaleSize * Config.Layout.Scale,
+                scaleSize * Config.Layout.Scale * 0.9f,
                 SpriteEffects.None,
                 depthProvider.GetDepth());
         }
@@ -350,7 +351,7 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             var isPlaced = (Game1.currentLocation as DecoratableLocation)?.furniture.Contains(this) ?? false;
             foreach (var kv in LightSources.ToList())
             {
-                if (ItemProvider.HasItem(kv.Key) && isPlaced && GlowConfig.ShowLights)
+                if (ItemProvider.Contains(kv.Key) && isPlaced && GlowConfig.ShowLights)
                 {
                     Game1.currentLightSources.Add(kv.Value);
                 }

@@ -17,16 +17,17 @@ namespace Igorious.StardewValley.DynamicApi2.Compatibility
 
         private static readonly Lazy<CjbItemSpawnerCompatibilityLayout> Lazy = new Lazy<CjbItemSpawnerCompatibilityLayout>(() => new CjbItemSpawnerCompatibilityLayout());
         public static CjbItemSpawnerCompatibilityLayout Instance => Lazy.Value;
-
         private CjbItemSpawnerCompatibilityLayout() { }
+
+        private static FieldInfo _itemListField;
+        private static MethodInfo _loadInventoryMethod;
+        private IClickableMenu CurrentMenu { get; set; }
 
         public void Initialize()
         {
             if (!Smapi.GetModRegistry().IsLoaded(CjbItemSpawnerID)) return;
             MenuEvents.MenuChanged += OnMenuChanged;
         }
-
-        private IClickableMenu CurrentMenu { get; set; }
 
         private void OnMenuChanged(object s, EventArgsClickableMenuChanged e)
         {
@@ -35,7 +36,8 @@ namespace Igorious.StardewValley.DynamicApi2.Compatibility
             Log.Trace("Overriding CJB Item Spawner menu items...");
 
             CurrentMenu = e.NewMenu;
-            var itemList = CurrentMenu.GetType().GetField<List<Item>>("itemList");
+            var itemListField = _itemListField ?? (_itemListField = CurrentMenu.GetType().GetInstanceField("itemList"));
+            var itemList = CurrentMenu.GetFieldValue<List<Item>>(itemListField);
             for (var i = 0; i < itemList.Count; ++i)
             {
                 var item = itemList[i] as Object;
@@ -43,29 +45,10 @@ namespace Igorious.StardewValley.DynamicApi2.Compatibility
                 itemList[i] = Wrapper.Instance.Wrap(item);
             }
 
-            var loadInventory = CurrentMenu.GetType().GetMethod("loadInventory", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            loadInventory.Invoke(CurrentMenu, null);
+            var loadInventoryMethod = _loadInventoryMethod ?? (_loadInventoryMethod = CurrentMenu.GetType().GetInstanceMethod("loadInventory"));
+            loadInventoryMethod.Invoke(CurrentMenu, null);
 
             Log.Trace("Overrided CJB Item Spawner menu items.");
-
-            MenuEvents.MenuClosed += OnMenuClosed;
-            GameEvents.UpdateTick += OnMenuUpdateTick;
-        }
-
-        private void OnMenuUpdateTick(object sender, EventArgs e)
-        {
-            var heldItem = CurrentMenu.GetField<Object>("heldItem");
-            if (heldItem == null) return;
-            var wrapped = Wrapper.Instance.Wrap(heldItem);
-            if (heldItem == wrapped) return;
-            CurrentMenu.SetField("heldItem", wrapped);
-            Log.Trace("Wrapped item under cursor.");
-        }
-
-        private void OnMenuClosed(object sender, EventArgsClickableMenuClosed e)
-        {
-            GameEvents.UpdateTick -= OnMenuUpdateTick;
-            CurrentMenu = null;
         }
     }
 }

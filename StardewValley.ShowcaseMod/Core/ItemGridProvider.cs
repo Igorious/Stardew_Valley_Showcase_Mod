@@ -1,10 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using StardewValley;
 
 namespace Igorious.StardewValley.ShowcaseMod.Core
 {
-    internal class ItemGridProvider
+    internal class ItemGridProvider : ICollection<Item>, IReadOnlyCollection<Item>
     {
         private List<Item> Items { get; }
         private int InitialRows { get; }
@@ -22,7 +23,6 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
         public bool IsHorizontal => (CurrentRotation != -1) && (CurrentRotation % 2 == 1);
         public int Rows => IsHorizontal? InitialColumns : InitialRows;
         public int Columns => IsHorizontal? InitialRows : InitialColumns;
-        public int Capacity => Items.Count;
 
         public ItemGridProvider Clone(int newRotation)
         {
@@ -39,18 +39,6 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             {
                 Items.Add(null);
             }
-        }
-
-        public bool IsEmpty() => Items.All(i => i == null);
-
-        public Item GetNotEmpty() => Items.First(i => i != null);
-
-        public bool HasItem(Item item) => Items.Contains(item);
-
-        public void AddItem(Item i)
-        {
-            var index = Items.IndexOf(null);
-            Items[index] = i;
         }
 
         public void UpdateCurrentRotation(int currentRotation)
@@ -112,6 +100,46 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
         private int AsRotation(int r)
         {
             return (r + 8) % 4;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => Items.GetEnumerator();
+        IEnumerator<Item> IEnumerable<Item>.GetEnumerator() => Items.GetEnumerator();
+        public bool Contains(Item item) => Items.Contains(item);
+        public void CopyTo(Item[] array, int arrayIndex) => Items.CopyTo(array, arrayIndex);
+        public int Count => Items.Count;
+        public bool IsReadOnly => false;
+
+        public void Add(Item item)
+        {
+            var index = Items.IndexOf(null);
+            if (index != -1)
+            {
+                Items[index] = item;
+            }
+            else
+            {
+                Items.Add(item);
+            }
+        }
+
+        public bool Remove(Item item)
+        {
+            var index = Items.IndexOf(item);
+            if (index != -1)
+            {
+                Items[index] = null;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void Clear()
+        {
+            Items.Clear();
+            Items.AddRange(Enumerable.Repeat<Item>(null, Rows * Columns));
         }
     }
 }

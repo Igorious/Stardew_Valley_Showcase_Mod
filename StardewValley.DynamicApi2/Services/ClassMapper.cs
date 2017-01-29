@@ -1,7 +1,6 @@
 ﻿using System;
 using Igorious.StardewValley.DynamicApi2.Compatibility;
 using Igorious.StardewValley.DynamicApi2.Events;
-using Igorious.StardewValley.DynamicApi2.Extensions;
 using Igorious.StardewValley.DynamicApi2.Utils;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -16,7 +15,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
         public static ClassMapper Instance => Lazy.Value;
 
         private bool IsMappingActivated { get; set; }
-        private ShopMenu CurrentShopMenu { get; set; }
+        private ShopMenuProxy CurrentShopMenu { get; set; }
 
         private ClassMapper()
         {
@@ -57,7 +56,7 @@ namespace Igorious.StardewValley.DynamicApi2.Services
         {
             if (!(e.NewMenu is ShopMenu shopMenu)) return;
 
-            CurrentShopMenu = shopMenu;
+            CurrentShopMenu = new ShopMenuProxy(shopMenu);
             WrapMenuItems();
 
             GameEvents.UpdateTick += OnMenuUpdateTick;
@@ -65,26 +64,24 @@ namespace Igorious.StardewValley.DynamicApi2.Services
 
         private void OnMenuItemsAdded(object sender, EventArgsClickableMenuChanged e)
         {
-            if (e.NewMenu != CurrentShopMenu) return;
             WrapMenuItems();
         }
 
         private void WrapMenuItems()
         {
-            var menuProxy = new ShopMenuProxy(CurrentShopMenu);
-            for (var i = 0; i < menuProxy.ItemsForSale.Count; ++i)
+            for (var i = 0; i < CurrentShopMenu.ItemsForSale.Count; ++i)
             {
-                var item = menuProxy.ItemsForSale[i] as Object;
+                var item = CurrentShopMenu.ItemsForSale[i] as Object;
                 if (item == null) continue;
 
                 var wrappedItem = Wrap(item);
                 if (wrappedItem == item) continue;
 
-                menuProxy.ItemsForSale[i] = wrappedItem;
-                if (menuProxy.ItemsPriceAndStock.TryGetValue(item, out var value))
+                CurrentShopMenu.ItemsForSale[i] = wrappedItem;
+                if (CurrentShopMenu.ItemsPriceAndStock.TryGetValue(item, out var value))
                 {
-                    menuProxy.ItemsPriceAndStock.Remove(item);
-                    menuProxy.ItemsPriceAndStock.Add(wrappedItem, value);
+                    CurrentShopMenu.ItemsPriceAndStock.Remove(item);
+                    CurrentShopMenu.ItemsPriceAndStock.Add(wrappedItem, value);
                 }
                 Log.Trace("Wrapped item in menu.");
             }
@@ -92,13 +89,13 @@ namespace Igorious.StardewValley.DynamicApi2.Services
 
         private void OnMenuUpdateTick(object sender, EventArgs e)
         {
-            var menuHeldItem = CurrentShopMenu.GetField<Object>("heldItem");
+            var menuHeldItem = CurrentShopMenu.HeldItem as Object;
             if (menuHeldItem == null) return;
 
             var wrappedItem = Wrap(menuHeldItem);
             if (wrappedItem == menuHeldItem) return;
 
-            CurrentShopMenu.SetField("heldItem", wrappedItem);
+            CurrentShopMenu.HeldItem = menuHeldItem;
             Log.Trace("Wrapped item under cursor.");
         }
 

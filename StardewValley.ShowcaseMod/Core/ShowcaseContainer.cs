@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Igorious.StardewValley.DynamicApi2.Extensions;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
@@ -9,7 +10,8 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 {
     internal sealed class ShowcaseContainer : StorageContainer
     {
-        private Showcase Showcase { get; }
+        private static readonly Lazy<FieldInfo> ItemChangeBehaviorField = typeof(StorageContainer).GetLazyInstanceField("itemChangeBehavior");
+
         private List<Item> Items { get; }
         private DiscreteColorPicker ColorPicker { get; }
 
@@ -22,9 +24,8 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
             bool allowColoring)
             : base(items, capacity, rows, null, isItemEnabled)
         {
-            Showcase = showcase;
             Items = items;
-            this.SetField<behaviorOnItemChange>("itemChangeBehavior", ProcessItemChanged);
+            this.SetFieldValue<behaviorOnItemChange>(ItemChangeBehaviorField, ProcessItemChanged);
             ItemsToGrabMenu.movePosition(0, (3 - rows) * Game1.tileSize);
 
             if (!allowColoring) return;

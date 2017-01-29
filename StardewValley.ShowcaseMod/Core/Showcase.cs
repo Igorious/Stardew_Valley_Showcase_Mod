@@ -2,6 +2,8 @@
 using System.Linq;
 using Igorious.StardewValley.DynamicApi2.Contracts;
 using Igorious.StardewValley.DynamicApi2.Data;
+using Igorious.StardewValley.DynamicApi2.Extensions;
+using Igorious.StardewValley.DynamicApi2.Services;
 using Igorious.StardewValley.ShowcaseMod.Constants;
 using Igorious.StardewValley.ShowcaseMod.Data;
 using Igorious.StardewValley.ShowcaseMod.ModConfig;
@@ -68,24 +70,31 @@ namespace Igorious.StardewValley.ShowcaseMod.Core
 
             ItemProvider.Recalculate();
             var rows = ItemProvider.Rows;
-            var cellsCount = (ItemProvider.Capacity + rows - 1) / rows * rows;
+            var cellsCount = (ItemProvider.Count + rows - 1) / rows * rows;
             var allowColoring = (Config.Tint != null || Config.SecondTint != null) && !Config.AutoTint;
             Game1.activeClickableMenu = new ShowcaseContainer(this, ItemProvider.GetInternalList(), cellsCount, rows, Filter.IsPass, allowColoring);
             return true;
         }
 
-        public override Item getOne() => (Item)MemberwiseClone();
+        public override Item getOne()
+        {
+            var thisCopy = new Showcase(parentSheetIndex);
+            Cloner.Instance.CopyData(base.getOne(), thisCopy);
+            thisCopy.Initialize();
+            thisCopy.ItemProvider.AddRange(ItemProvider);
+            return thisCopy;
+        }
 
         public override bool performObjectDropInAction(Object dropIn, bool probe, Farmer who)
         {
             if (!Filter.IsPass(dropIn)) return false;
             ItemProvider.Recalculate();
-            if (!ItemProvider.HasItem(null)) return false;
+            if (!ItemProvider.Contains(null)) return false;
             if (probe) return true;
 
             Game1.playSound("woodyStep");
             who.reduceActiveItemByOne();
-            ItemProvider.AddItem(dropIn.getOne());
+            ItemProvider.Add(dropIn.getOne());
             return true;
         }
 

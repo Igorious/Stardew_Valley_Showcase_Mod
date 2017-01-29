@@ -26,27 +26,33 @@ namespace Igorious.StardewValley.DynamicApi2.Extensions
             return type.GetFields(flags).Concat(GetAllFields(type.BaseType));
         }
 
-        public static T GetField<T>(this object o, string fieldName) where T : class
+        public static MethodInfo GetInstanceMethod(this Type type, string methodName)
         {
-            return GetField<T>(o, o.GetType(), fieldName);
+            var method = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (method == null) throw new InvalidOperationException($"Can't get instance method \"{methodName}\" of type {type.Name}");
+            return method;
         }
 
-        public static T GetField<T>(this Type type, string fieldName) where T : class
-        {
-            return GetFieldInfo(type, fieldName, isStatic: true)?.GetValue(null) as T;
-        }
+        public static Lazy<FieldInfo> GetLazyInstanceField(this Type type, string fieldName) 
+            => new Lazy<FieldInfo>(() => type.GetInstanceField(fieldName));
 
-        public static void SetField<T>(this object o, string fieldName, T value) where T : class
-        {
-            var fieldInfo = GetFieldInfo(o.GetType(), fieldName, isStatic: false);
-            fieldInfo?.SetValue(o, value);
-        }
+        public static FieldInfo GetInstanceField(this Type type, string fieldName) 
+            => GetFieldInfo(type, fieldName, isStatic: false);
 
-        public static bool IsImplementGenericInterface(this Type t, Type genericInterface)
-        {
-            return t.GetInterfaces().Where(i => i.IsGenericType)
-                .Any(i => i.GetGenericTypeDefinition() == genericInterface);
-        }
+        public static T GetFieldValue<T>(this object o, Lazy<FieldInfo> fieldInfo) where T : class 
+            => o.GetFieldValue<T>(fieldInfo.Value);
+
+        public static T GetFieldValue<T>(this object o, FieldInfo fieldInfo) where T : class 
+            => fieldInfo.GetValue(o) as T;
+
+        public static void SetFieldValue<T>(this object o, Lazy<FieldInfo> fieldInfo, T value)
+            => o.SetFieldValue(fieldInfo.Value, value);
+
+        public static void SetFieldValue<T>(this object o, FieldInfo fieldInfo, T value) 
+            => fieldInfo.SetValue(o, value);
+
+        public static bool IsImplementGenericInterface(this Type t, Type genericInterface) => 
+            t.GetInterfaces().Where(i => i.IsGenericType).Any(i => i.GetGenericTypeDefinition() == genericInterface);
 
         private static IEnumerable<Type> GetTypeHierarchy(Type type)
         {
@@ -57,11 +63,6 @@ namespace Igorious.StardewValley.DynamicApi2.Extensions
             } while (type != null);
         }
 
-        private static T GetField<T>(object o, Type type, string fieldName) where T : class
-        {
-            return GetFieldInfo(type, fieldName, isStatic: false)?.GetValue(o) as T;
-        }
-
         private static FieldInfo GetFieldInfo(Type type, string fieldName, bool isStatic)
         {
             while (type != typeof(object))
@@ -70,7 +71,7 @@ namespace Igorious.StardewValley.DynamicApi2.Extensions
                 if (fieldInfo != null) return fieldInfo;
                 type = type.BaseType;
             }
-            return null;
+            throw new InvalidOperationException($"Can't get field \"{fieldName}\" of type {type.Name}");
         }
     }
 }

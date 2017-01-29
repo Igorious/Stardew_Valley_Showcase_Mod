@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Igorious.StardewValley.DynamicApi2.Extensions;
 using StardewModdingAPI.Events;
-using StardewValley;
 using StardewValley.Menus;
 using Object = StardewValley.Object;
 
@@ -20,6 +20,9 @@ namespace Igorious.StardewValley.DynamicApi2.Events
 
         private static class CraftedObjectChangedHandler
         {
+            private static readonly Lazy<FieldInfo> CraftingPageHeldItemField = typeof(CraftingPage).GetLazyInstanceField("heldItem");
+            private static readonly Lazy<FieldInfo> GameMenuPagesField = typeof(GameMenu).GetLazyInstanceField("pages");
+
             private static CraftingPage CraftingMenu { get; set; }
             private static Object PreviousCraftedObject { get; set; }
 
@@ -27,7 +30,7 @@ namespace Igorious.StardewValley.DynamicApi2.Events
             {
                 if (!(e.NewMenu is GameMenu)) return;
 
-                CraftingMenu = e.NewMenu.GetField<List<IClickableMenu>>("pages").OfType<CraftingPage>().First();
+                CraftingMenu = e.NewMenu.GetFieldValue<List<IClickableMenu>>(GameMenuPagesField).OfType<CraftingPage>().First();
                 GameEvents.UpdateTick += OnCrafted;
                 MenuEvents.MenuClosed += OnCraftingMenuClosed;
             }
@@ -42,14 +45,14 @@ namespace Igorious.StardewValley.DynamicApi2.Events
 
             private static void OnCrafted(object sender, EventArgs e)
             {
-                var heldItem = CraftingMenu.GetField<Item>("heldItem") as Object;
+                var heldItem = CraftingMenu.GetFieldValue<Object>(CraftingPageHeldItemField);
                 if (PreviousCraftedObject == heldItem) return;
 
                 var args = new ObjectEventArgs(heldItem);
                 CraftedObjectChanged?.Invoke(args);
                 if (heldItem != args.Object)
                 {
-                    CraftingMenu.SetField<Item>("heldItem", PreviousCraftedObject = args.Object);
+                    CraftingMenu.SetFieldValue(CraftingPageHeldItemField, PreviousCraftedObject = args.Object);
                 }
             }
         }

@@ -90,6 +90,7 @@
     <Compile Include="Events\InventoryEvents.cs" />
     <Compile Include="Events\ObjectEventArgs.cs" />
     <Compile Include="Extensions\BoolExtensions.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
